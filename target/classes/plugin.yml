@@ -1,0 +1,12 @@
+name: MiniGameStructure
+version: '1.0-SNAPSHOT'
+main: org.test.minigamestructure.MiniGameStructure
+api-version: '1.20'
+load: STARTUP
+commands:
+  resetmap:
+  startgame:
+  resetchests:
+  setplayerspawn:
+  resetmapprecise:
+  setchestspawn:

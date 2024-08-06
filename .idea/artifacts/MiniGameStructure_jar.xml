@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="MiniGameStructure:jar">
+    <output-path>$PROJECT_DIR$/../../../../Other/Paper Servers/The Limaverse/HUNGER_GAMES - Copy/plugins</output-path>
+    <root id="archive" name="MiniGameStructure.jar">
+      <element id="module-output" name="MiniGameStructure" />
+    </root>
+  </artifact>
+</component>
