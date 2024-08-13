@@ -13,6 +13,8 @@ public class SetPlayerSpawnCommand implements CommandExecutor {
     // Constructor to initialize the PlayerHandler.
     public SetPlayerSpawnCommand(MiniGameStructure plugin) {
         this.playerHandler = new PlayerHandler(plugin);
+
+        plugin.getCommand("setplayerspawn").setExecutor(this);
     }
 
     @Override

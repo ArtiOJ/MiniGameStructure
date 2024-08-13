@@ -12,10 +12,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.test.minigamestructure.MiniGameStructure;
-import org.test.minigamestructure.gameevents.CountDownEvent;
-import org.test.minigamestructure.gameevents.FreezePlayersEvent;
-import org.test.minigamestructure.gameevents.GiveStartGameEffectsEvent;
-import org.test.minigamestructure.gameevents.GiveStartingItemsEvent;
+import org.test.minigamestructure.gameevents.*;
 import org.test.minigamestructure.handlers.ChestSpawningHandler;
 import org.test.minigamestructure.handlers.chesthandler.ChestHandler;
 import org.test.minigamestructure.handlers.PlayerHandler;
@@ -68,6 +65,7 @@ public class StartGameCommand implements CommandExecutor {
         // Freeze players for 5 seconds and start a countdown event.
         new FreezePlayersEvent(plugin, 5, false);
         new CountDownEvent(plugin, 5, Sound.BLOCK_NOTE_BLOCK_PLING);
+        new LockChestsEvent(plugin, 30);
 
         // Schedule a task to give start game effects after 5 seconds (5 * 20 ticks).
         Bukkit.getScheduler().runTaskLater(plugin, () -> {

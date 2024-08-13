@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Random;
 
 /**
  * Handles the resetting of maps, including specific variations and chest states.
@@ -76,21 +77,25 @@ public class ResetHandler {
             return;
         }
 
-        // Reset the map with the default setup
-        resetWorld(mapFolder);
+        File[] variations = mapFolder.listFiles(File::isDirectory);
 
-        // Reset chests after map reset
+        if (variations == null || variations.length == 0) {
+            Bukkit.broadcastMessage(Colorize.format("&cNo variations found for map: " + mapName));
+            return;
+        }
+
+        File selectedVariation = variations[new Random().nextInt(variations.length)];
+
+        resetWorld(selectedVariation);
         chestHandler.resetChests();
+        Bukkit.broadcastMessage(Colorize.format("&cThe map has been reset to a random variation. Server will restart in 3 seconds..."));
 
-        // Notify about the restart requirement with countdown
-        Bukkit.broadcastMessage(Colorize.format("&cThe map has been reset. Server will restart in 3 seconds..."));
-
-        // Schedule a restart after 3 seconds (60 ticks)
         BukkitScheduler scheduler = Bukkit.getScheduler();
         scheduler.runTaskLater(plugin, () -> {
-            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "restart"); // Use "stop" if you don't have a restart command
-        }, 60L); // 60 ticks = 3 seconds
+            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "restart");
+        }, 60L);
     }
+
 
     /**
      * Resets the world to the state defined in the given map folder.

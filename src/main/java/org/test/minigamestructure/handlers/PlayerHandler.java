@@ -2,6 +2,7 @@ package org.test.minigamestructure.handlers;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -10,26 +11,32 @@ import org.test.minigamestructure.MiniGameStructure;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class PlayerHandler {
     private final MiniGameStructure plugin;
-    private final FileConfiguration playerSpawnsConfig;
+    private final World world;
+    private File configFile;
+    private FileConfiguration config;
+    private static final String SPAWNS_FILE_NAME = "player_spawns.yml";
 
     public PlayerHandler(MiniGameStructure plugin) {
         this.plugin = plugin;
-        File playerSpawnsFile = new File(Bukkit.getServer().getWorld("world").getWorldFolder(), "hunger_games_data/player_spawns.yml");
-        if (!playerSpawnsFile.exists()) {
+        this.world = Bukkit.getWorld("world");
+        File dataFolder = new File(plugin.getServer().getWorld("world").getWorldFolder(), "hunger_games_data");
+        configFile = new File(dataFolder, SPAWNS_FILE_NAME);
+        config = YamlConfiguration.loadConfiguration(configFile);
+
+        if (!configFile.exists()) {
             // Handle file not existing
             plugin.getLogger().warning("player_spawns.yml file does not exist.");
         }
-        this.playerSpawnsConfig = YamlConfiguration.loadConfiguration(playerSpawnsFile);
-        if (playerSpawnsConfig == null) {
-            Bukkit.getLogger().warning("playerSpawnsConfig at: " + playerSpawnsFile + " is null.");
+
+        if (config == null) {
+            Bukkit.getLogger().warning("playerSpawnsConfig at: " + config + " is null.");
             return;
         }
-        if (playerSpawnsConfig.get("max_players") != null) {
-            Bukkit.setMaxPlayers(playerSpawnsConfig.getInt("max_players"));
+        if (config.get("max_players") != null) {
+            Bukkit.setMaxPlayers(config.getInt("max_players"));
         }
     }
 
@@ -40,7 +47,6 @@ public class PlayerHandler {
      * @return The spawn location, or null if not found.
      */
     public Location getSpawnLocation(String key) {
-        FileConfiguration config = playerSpawnsConfig;
         if (config.contains("player_spawns." + key)) {
             String data = config.getString("player_spawns." + key);
             String[] parts = data.split(",");
@@ -67,7 +73,9 @@ public class PlayerHandler {
      * @param yaw      The yaw.
      */
     public void setSpawnLocation(String key, double x, double y, double z, float pitch, float yaw) {
-        FileConfiguration config = playerSpawnsConfig;
+        x = Math.floor(x) + 0.5;
+        z = Math.floor(z) + 0.5;
+
         String path = "player_spawns." + key;
         String data = x + "," + y + "," + z + "," + pitch + "," + yaw;
         config.set(path, data);
@@ -81,8 +89,8 @@ public class PlayerHandler {
         Set<Location> spawnLocations = new HashSet<>();
 
         // Collect all player spawn locations
-        if (playerSpawnsConfig.contains("player_spawns")) {
-            for (String key : playerSpawnsConfig.getConfigurationSection("player_spawns").getKeys(false)) {
+        if (config.contains("player_spawns")) {
+            for (String key : config.getConfigurationSection("player_spawns").getKeys(false)) {
                 Location location = getSpawnLocation(key);
                 if (location != null) {
                     spawnLocations.add(location);
@@ -109,9 +117,8 @@ public class PlayerHandler {
      * Saves the player spawns configuration file.
      */
     private void saveConfig() {
-        File playerSpawnsFile = new File(Bukkit.getWorldContainer(), "hunger_games_data/player_spawns.yml");
         try {
-            playerSpawnsConfig.save(playerSpawnsFile);
+            config.save(configFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
