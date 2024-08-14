@@ -14,6 +14,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.test.minigamestructure.MiniGameStructure;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
