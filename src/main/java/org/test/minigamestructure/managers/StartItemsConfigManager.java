@@ -43,89 +43,88 @@ public class StartItemsConfigManager {
         }
     }
 
-    public void giveStartingItems() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            for (String key : config.getKeys(false)) {
-                // Get item material
-                String materialName = config.getString(key + ".material");
-                Material material = Material.getMaterial(materialName);
-                if (material == null) {
-                    logError("Invalid material: " + materialName, key);
-                    continue; // Skip invalid material
-                }
+public void giveStartingItems() {
+    List<ItemStack> startingItems = new ArrayList<>();
 
-                // Create the item stack
-                int amount = config.getInt(key + ".amount", 1);
-                ItemStack item = new ItemStack(material, amount);
+    for (String key : config.getKeys(false)) {
+        // Get item material
+        String materialName = config.getString(key + ".material");
+        Material material = Material.getMaterial(materialName);
+        if (material == null) {
+            logError("Invalid material: " + materialName, key);
+            continue; // Skip invalid material
+        }
 
-                // Set item meta
-                ItemMeta meta = item.getItemMeta();
-                if (meta != null) {
-                    // Set item name
-                    if (config.contains(key + ".name")) {
-                        meta.setDisplayName(config.getString(key + ".name"));
-                    }
+        int amount = config.getInt(key + ".amount", 1);
+        ItemStack item = new ItemStack(material, amount);
 
-                    // Set item enchantments
-                    if (config.contains(key + ".enchantments")) {
-                        for (String enchantmentKey : config.getConfigurationSection(key + ".enchantments").getKeys(false)) {
-                            Enchantment enchantment = Enchantment.getByKey(
-                                    NamespacedKey.minecraft(
-                                            enchantmentKey.toLowerCase()
-                                    )
-                            );
-                            int level = config.getInt(key + ".enchantments." + enchantmentKey, 1);
-                            if (enchantment != null) {
-                                meta.addEnchant(enchantment, level, true);
-                            } else {
-                                logError("Invalid enchantment: " + enchantmentKey, key);
-                            }
-                        }
-                    }
-
-                    // Set item unbreakable
-                    if (config.getBoolean(key + ".unbreakable", false)) {
-                        meta.setUnbreakable(true);
-                    }
-
-                    // Set item flags
-                    if (config.contains(key + ".flags")) {
-                        List<String> flags = config.getStringList(key + ".flags");
-                        for (String flag : flags) {
-                            try {
-                                ItemFlag itemFlag = ItemFlag.valueOf(flag);
-                                meta.addItemFlags(itemFlag);
-                            } catch (IllegalArgumentException e) {
-                                logError("Invalid item flag: " + flag, key);
-                            }
-                        }
-                    }
-
-                    // Set item attributes
-                    if (config.contains(key + ".attributes")) {
-                        for (String attributeKey : config.getConfigurationSection(key + ".attributes").getKeys(false)) {
-                            try {
-                                Attribute attribute = Attribute.valueOf(attributeKey);
-                                double amountModifier = config.getDouble(key + ".attributes." + attributeKey + ".amount");
-                                String operation = config.getString(key + ".attributes." + attributeKey + ".operation", "ADD_NUMBER").toUpperCase();
-                                UUID uuid = UUID.randomUUID();
-
-                                AttributeModifier modifier = new AttributeModifier(uuid, attributeKey, amountModifier, AttributeModifier.Operation.valueOf(operation));
-                                meta.addAttributeModifier(attribute, modifier);
-                            } catch (IllegalArgumentException e) {
-                                logError("Invalid attribute or operation: " + attributeKey, key);
-                            }
-                        }
-                    }
-
-                    item.setItemMeta(meta);
-                }
-
-                // Give the item to the player
-                player.getInventory().addItem(item);
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            if (config.contains(key + ".name")) {
+                meta.setDisplayName(config.getString(key + ".name"));
             }
+
+            if (config.contains(key + ".enchantments")) {
+                for (String enchantmentKey : config.getConfigurationSection(key + ".enchantments").getKeys(false)) {
+                    Enchantment enchantment = Enchantment.getByKey(
+                            NamespacedKey.minecraft(
+                                    enchantmentKey.toLowerCase()
+                            )
+                    );
+                    int level = config.getInt(key + ".enchantments." + enchantmentKey, 1);
+                    if (enchantment != null) {
+                        meta.addEnchant(enchantment, level, true);
+                    } else {
+                        logError("Invalid enchantment: " + enchantmentKey, key);
+                    }
+                }
+            }
+
+            if (config.getBoolean(key + ".unbreakable", false)) {
+                meta.setUnbreakable(true);
+            }
+
+            if (config.contains(key + ".flags")) {
+                List<String> flags = config.getStringList(key + ".flags");
+                for (String flag : flags) {
+                    try {
+                        ItemFlag itemFlag = ItemFlag.valueOf(flag);
+                        meta.addItemFlags(itemFlag);
+                    } catch (IllegalArgumentException e) {
+                        logError("Invalid item flag: " + flag, key);
+                    }
+                }
+            }
+
+            if (config.contains(key + ".attributes")) {
+                for (String attributeKey : config.getConfigurationSection(key + ".attributes").getKeys(false)) {
+                    try {
+                        Attribute attribute = Attribute.valueOf(attributeKey);
+                        double amountModifier = config.getDouble(key + ".attributes." + attributeKey + ".amount");
+                        String operation = config.getString(key + ".attributes." + attributeKey + ".operation", "ADD_NUMBER").toUpperCase();
+                        UUID uuid = UUID.randomUUID();
+
+                        AttributeModifier modifier = new AttributeModifier(uuid, attributeKey, amountModifier, AttributeModifier.Operation.valueOf(operation));
+                        meta.addAttributeModifier(attribute, modifier);
+                    } catch (IllegalArgumentException e) {
+                        logError("Invalid attribute or operation: " + attributeKey, key);
+                    }
+                }
+            }
+
+            item.setItemMeta(meta);
+        }
+
+        startingItems.add(item);
+    }
+
+    for (Player player : Bukkit.getOnlinePlayers()) {
+        for (ItemStack item : startingItems) {
+            player.getInventory().addItem(item.clone());
         }
     }
+}
+
 
     private void logError(String message, String configKey) {
         int lineNumber = config.getConfigurationSection(configKey).getCurrentPath().split("\\.").length + 1;
