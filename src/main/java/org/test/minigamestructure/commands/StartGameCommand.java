@@ -16,6 +16,7 @@ import org.test.minigamestructure.gameevents.*;
 import org.test.minigamestructure.handlers.ChestSpawningHandler;
 import org.test.minigamestructure.handlers.chesthandler.ChestHandler;
 import org.test.minigamestructure.handlers.PlayerHandler;
+import org.test.minigamestructure.managers.StartItemsConfigManager;
 
 import java.util.List;
 
@@ -36,13 +37,13 @@ public class StartGameCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        StartItemsConfigManager configManager = new StartItemsConfigManager(plugin);
         // Iterate over all online players.
         for (Player player : Bukkit.getOnlinePlayers()) {
             // Clear inventory and potion effects, set to survival mode, and give starting items.
             player.getInventory().clear();
             player.clearActivePotionEffects();
             player.setGameMode(GameMode.SURVIVAL);
-            new GiveStartingItemsEvent(player);
         }
         World world = plugin.getServer().getWorld("world");
         List<Entity> entList = world.getEntities();
@@ -53,7 +54,7 @@ public class StartGameCommand implements CommandExecutor {
         }
 
 
-        // Reset all chests (moved out of the player loop for efficiency).
+        // Reset all chests
         chestHandler.resetChests();
 
         // Teleport players to their spawn points.
@@ -65,7 +66,8 @@ public class StartGameCommand implements CommandExecutor {
         // Freeze players for 5 seconds and start a countdown event.
         new FreezePlayersEvent(plugin, 5, false);
         new CountDownEvent(plugin, 5, Sound.BLOCK_NOTE_BLOCK_PLING);
-        new LockChestsEvent(plugin, 30);
+//        new LockChestsEvent(plugin, 30);
+        configManager.giveStartingItems();
 
         // Schedule a task to give start game effects after 5 seconds (5 * 20 ticks).
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
