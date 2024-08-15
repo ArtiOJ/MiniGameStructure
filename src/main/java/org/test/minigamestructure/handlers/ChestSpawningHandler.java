@@ -14,6 +14,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.meta.BlockDataMeta;
 import org.test.minigamestructure.MiniGameStructure;
+import org.test.minigamestructure.gameevents.ChestGlowEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,6 +30,7 @@ public class ChestSpawningHandler {
     private final World world;
     private MiniGameStructure plugin;
     private File configFile;
+    private final int CHEST_GLOW_TIME = 30;
 
     public ChestSpawningHandler(MiniGameStructure plugin) {
         this.world = Bukkit.getWorld("world");
@@ -133,13 +135,15 @@ public class ChestSpawningHandler {
             }
         }
 
+        ChestGlowEvent chestGlowEvent = new ChestGlowEvent(plugin);
+
         Collections.shuffle(containerLocations);
-        placeContainers(containerLocations, doubleChestCount, Material.CHEST, true);
-        placeContainers(containerLocations, chestCount, Material.CHEST, false);
-        placeContainers(containerLocations, barrelCount, Material.BARREL, false);
+        placeContainers(containerLocations, doubleChestCount, Material.CHEST, true, chestGlowEvent);
+        placeContainers(containerLocations, chestCount, Material.CHEST, false, chestGlowEvent);
+        placeContainers(containerLocations, barrelCount, Material.BARREL, false, chestGlowEvent);
     }
 
-    private void placeContainers(List<Location> locations, int count, Material material, boolean isDoubleChest) {
+    private void placeContainers(List<Location> locations, int count, Material material, boolean isDoubleChest, ChestGlowEvent chestGlowEvent) {
         List<BlockFace> faces = Arrays.asList(BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST);
         for (int i = 0; i < count && !locations.isEmpty(); i++) {
             Location loc = locations.remove(0);
@@ -153,6 +157,7 @@ public class ChestSpawningHandler {
                 chestData.setFacing(face);
                 chestData.setType(Chest.Type.LEFT);
                 block.setBlockData(chestData);
+                chestGlowEvent.summonGlowingMagmaCube(block.getLocation(), CHEST_GLOW_TIME);
 
                 Location adjacentLoc = null;
                 switch (face) {
@@ -178,11 +183,13 @@ public class ChestSpawningHandler {
                     adjacentChestData.setFacing(face);
                     adjacentChestData.setType(Chest.Type.RIGHT);
                     adjacentBlock.setBlockData(adjacentChestData);
+                    chestGlowEvent.summonGlowingMagmaCube(adjacentBlock.getLocation(), CHEST_GLOW_TIME);
                 }
             } else {
                 Directional directional = (Directional) block.getBlockData();
                 directional.setFacing(faces.get(random.nextInt(faces.size())));
                 block.setBlockData(directional);
+                chestGlowEvent.summonGlowingMagmaCube(block.getLocation(), CHEST_GLOW_TIME);
             }
         }
     }
