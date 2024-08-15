@@ -1,0 +1,97 @@
+# These are the items all players start with when /startgame is executed
+# To view all attributes: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/attribute/Attribute.html
+# Attribute operations:
+#   - ADD_NUMBER
+#   - ADD_PERCENTAGE
+#   - MULTIPLY_BASE
+#   - MULTIPLY_TOTAL
+# To view all flags: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/inventory/ItemFlag.html
+0:
+  material: IRON_PICKAXE
+  enchantments:
+    EFFICIENCY: 3
+  unbreakable: true
+  flags:
+    - HIDE_ENCHANTS
+  amount: 1
+
+1:
+  material: SMOOTH_STONE
+  amount: 16
+
+# ============================================
+# Example usages (uncomment to use)
+# ============================================
+
+# Example 1: Simple item with a custom name
+# 2:
+#   material: DIAMOND_SWORD
+#   name: "&bSharp Blade"
+#   amount: 1
+
+# Example 2: Item with multiple enchantments and unbreakable flag
+# 3:
+#   material: BOW
+#   enchantments:
+#     POWER: 5
+#     INFINITY: 1
+#   unbreakable: true
+#   amount: 1
+
+# Example 3: Item with item flags and custom name
+# 4:
+#   material: GOLDEN_APPLE
+#   name: "&6Golden Apple of Immortality"
+#   flags:
+#     - HIDE_ATTRIBUTES
+#   amount: 3
+
+# Example 4: Item using all features
+# 5:
+#   material: NETHERITE_AXE
+#   name: "&cWarrior's Axe"
+#   enchantments:
+#     SHARPNESS: 5
+#     EFFICIENCY: 4
+#   unbreakable: true
+#   flags:
+#     - HIDE_ENCHANTS
+#     - HIDE_UNBREAKABLE
+#   amount: 1
+
+# Example 5: Item with all possible item flags
+# 6:
+#   material: NETHERITE_HELMET
+#   name: "&eUltimate Helmet"
+#   enchantments:
+#     PROTECTION: 4
+#     RESPIRATION: 3
+#   unbreakable: true
+#   flags:
+#     - HIDE_ENCHANTS
+#     - HIDE_ATTRIBUTES
+#     - HIDE_UNBREAKABLE
+#     - HIDE_DESTROYS
+#     - HIDE_PLACED_ON
+#     - HIDE_POTION_EFFECTS
+#     - HIDE_DYE
+#     - HIDE_ARMOR_TRIM
+#   amount: 1
+
+# Example 6: Item with custom attributes
+# 7:
+#   material: DIAMOND_SWORD
+#   name: "&6Custom Sword"
+#   enchantments:
+#     SHARPNESS: 5
+#   unbreakable: true
+#   flags:
+#     - HIDE_ATTRIBUTES
+#   attributes:
+#     GENERIC_ATTACK_DAMAGE:
+#       amount: 10.0
+#       operation: ADD_NUMBER
+#     GENERIC_ATTACK_SPEED:
+#       amount: -2.0
+#       operation: ADD_NUMBER
+#   amount: 1
