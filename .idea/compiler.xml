@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="MiniGameStructure" target="1.8" />
+      <module name="MiniGameStructure" target="16" />
     </bytecodeTargetLevel>
   </component>
 </project>
