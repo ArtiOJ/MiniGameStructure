@@ -44,19 +44,15 @@ public class StartGameCommand implements CommandExecutor {
             player.setGameMode(GameMode.SURVIVAL);
         }
 
-        // Run item removal and chest resetting asynchronously.
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            World world = plugin.getServer().getWorld("world");
-            List<Entity> entList = world.getEntities();
-            for (Entity current : entList) {
-                if (current.getType() == EntityType.DROPPED_ITEM) {
-                    current.remove();
-                }
-            }
 
-            // Reset all chests
-            chestHandler.resetChests();
-        });
+        World world = plugin.getServer().getWorld("world");
+        List<Entity> entList = world.getEntities();
+        for (Entity current : entList) {
+            if (current.getType() == EntityType.DROPPED_ITEM) {
+                current.remove();
+            }
+        }
+
 
         // Run player teleportation and chest spawning on the main thread.
         playerHandler.teleportPlayers();
@@ -66,7 +62,8 @@ public class StartGameCommand implements CommandExecutor {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             new FreezePlayersEvent(plugin, 5, false);
             new CountDownEvent(plugin, 5, Sound.BLOCK_NOTE_BLOCK_PLING);
-//            new LockChestsEvent(plugin, 30);
+            // Reset all chests
+            chestHandler.resetChests();
             configManager.giveStartingItems();
         });
 
