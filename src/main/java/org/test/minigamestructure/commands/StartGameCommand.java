@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.test.minigamestructure.MiniGameStructure;
 import org.test.minigamestructure.gameevents.*;
 import org.test.minigamestructure.handlers.ChestSpawningHandler;
+import org.test.minigamestructure.handlers.PlayerXpTimerHandler;
 import org.test.minigamestructure.handlers.chesthandler.ChestHandler;
 import org.test.minigamestructure.handlers.PlayerHandler;
 import org.test.minigamestructure.managers.StartItemsConfigManager;
@@ -25,12 +26,14 @@ public class StartGameCommand implements CommandExecutor {
     private final PlayerHandler playerHandler;
     private final ChestHandler chestHandler;
     private final ChestSpawningHandler chestSpawningHandler;
+    private final PlayerXpTimerHandler playerXpTimerHandler;
 
-    public StartGameCommand(MiniGameStructure plugin, PlayerHandler playerHandler, ChestHandler chestHandler, ChestSpawningHandler chestSpawningHandler) {
+    public StartGameCommand(MiniGameStructure plugin, PlayerHandler playerHandler, ChestHandler chestHandler, ChestSpawningHandler chestSpawningHandler, PlayerXpTimerHandler playerXpTimerHandler) {
         this.plugin = plugin;
         this.playerHandler = playerHandler;
         this.chestHandler = chestHandler;
         this.chestSpawningHandler = chestSpawningHandler;
+        this.playerXpTimerHandler = playerXpTimerHandler;
         plugin.getCommand("startgame").setExecutor(this);
     }
 
@@ -42,6 +45,8 @@ public class StartGameCommand implements CommandExecutor {
             player.getInventory().clear();
             player.clearActivePotionEffects();
             player.setGameMode(GameMode.SURVIVAL);
+            player.setLevel(0);
+            player.setExp(1);
         }
 
 
@@ -65,8 +70,13 @@ public class StartGameCommand implements CommandExecutor {
             // Reset all chests
             chestHandler.resetChests();
             configManager.giveStartingItems();
+            // Start all timers after reset
         });
 
+        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
+            playerXpTimerHandler.resetTimerAllTimers();
+            playerXpTimerHandler.startTimersForAllPlayers();
+        }, 20 * 20);
         // Schedule the start game effects on the main thread after 5 seconds (5 * 20 ticks).
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             new GiveStartGameEffectsEvent(plugin, 12);

@@ -3,6 +3,7 @@ package org.test.minigamestructure;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.test.minigamestructure.commands.*;
 import org.test.minigamestructure.handlers.PlayerHandler;
+import org.test.minigamestructure.handlers.PlayerXpTimerHandler;
 import org.test.minigamestructure.handlers.chesthandler.ChestHandler;
 import org.test.minigamestructure.handlers.ChestSpawningHandler;
 import org.test.minigamestructure.handlers.ResetHandler;
@@ -16,6 +17,7 @@ public class MiniGameStructure extends JavaPlugin {
     private PlayerHandler playerHandler;
     private ChestSpawningHandler chestSpawningHandler;
     private ResetHandler resetHandler;
+    private PlayerXpTimerHandler playerXpTimerHandler;
 
     /**
      * Called when the plugin is enabled. Initializes all components and registers commands.
@@ -27,7 +29,7 @@ public class MiniGameStructure extends JavaPlugin {
         playerHandler = new PlayerHandler(this);
         chestSpawningHandler = new ChestSpawningHandler(this);
         resetHandler = new ResetHandler(this, chestHandler);
-
+        playerXpTimerHandler = new PlayerXpTimerHandler(this);
         registerCommands();
     }
 
@@ -35,7 +37,7 @@ public class MiniGameStructure extends JavaPlugin {
      * Registers all commands used in the plugin.
      */
     private void registerCommands() {
-        new StartGameCommand(this, playerHandler, chestHandler, chestSpawningHandler);
+        new StartGameCommand(this, playerHandler, chestHandler, chestSpawningHandler, playerXpTimerHandler);
         new SetPlayerSpawnCommand(this);
         new SetChestSpawnCommand(this, chestSpawningHandler);
         new ResetMapCommand(this, chestHandler);
@@ -58,5 +60,9 @@ public class MiniGameStructure extends JavaPlugin {
 
     public ResetHandler getResetHandler() {
         return resetHandler;
+    }
+
+    public PlayerXpTimerHandler getPlayerXpTimerHandler(){
+        return playerXpTimerHandler;
     }
 }
