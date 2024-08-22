@@ -30,11 +30,12 @@ public class ChestSpawningHandler {
     private final World world;
     private MiniGameStructure plugin;
     private File configFile;
-    private final int CHEST_GLOW_TIME = 30;
+    private final int CHEST_GLOW_TIME;
 
     public ChestSpawningHandler(MiniGameStructure plugin) {
         this.world = Bukkit.getWorld("world");
         this.plugin = plugin;
+        CHEST_GLOW_TIME = random.nextInt(31) + 120;
         File dataFolder = new File(plugin.getServer().getWorld("world").getWorldFolder(), "hunger_games_data");
         configFile = new File(dataFolder, SPAWNS_FILE_NAME);
         config = YamlConfiguration.loadConfiguration(configFile);
