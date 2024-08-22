@@ -1,4 +1,4 @@
-package org.test.minigamestructure.handlers.chesthandler;
+package org.limaverse.minigamestructure.handlers.chesthandler;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

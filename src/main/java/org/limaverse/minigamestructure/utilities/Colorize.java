@@ -1,4 +1,4 @@
-package org.test.minigamestructure.utilities;
+package org.limaverse.minigamestructure.utilities;
 
 import org.bukkit.ChatColor;
 

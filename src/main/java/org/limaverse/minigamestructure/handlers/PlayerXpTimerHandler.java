@@ -1,4 +1,4 @@
-package org.test.minigamestructure.handlers;
+package org.limaverse.minigamestructure.handlers;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;

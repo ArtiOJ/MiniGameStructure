@@ -1,11 +1,11 @@
-package org.test.minigamestructure.commands;
+package org.limaverse.minigamestructure.commands;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.test.minigamestructure.MiniGameStructure;
-import org.test.minigamestructure.handlers.chesthandler.ChestHandler;
+import org.limaverse.minigamestructure.MiniGameStructure;
+import org.limaverse.minigamestructure.handlers.chesthandler.ChestHandler;
 
 public class ResetChestsCommand implements CommandExecutor {
 

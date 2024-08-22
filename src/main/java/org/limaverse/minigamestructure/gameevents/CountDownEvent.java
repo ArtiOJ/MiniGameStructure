@@ -1,4 +1,4 @@
-package org.test.minigamestructure.gameevents;
+package org.limaverse.minigamestructure.gameevents;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

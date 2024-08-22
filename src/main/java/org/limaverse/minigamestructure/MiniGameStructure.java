@@ -1,12 +1,12 @@
-package org.test.minigamestructure;
+package org.limaverse.minigamestructure;
 
 import org.bukkit.plugin.java.JavaPlugin;
-import org.test.minigamestructure.commands.*;
-import org.test.minigamestructure.handlers.PlayerHandler;
-import org.test.minigamestructure.handlers.PlayerXpTimerHandler;
-import org.test.minigamestructure.handlers.chesthandler.ChestHandler;
-import org.test.minigamestructure.handlers.ChestSpawningHandler;
-import org.test.minigamestructure.handlers.ResetHandler;
+import org.limaverse.minigamestructure.commands.*;
+import org.limaverse.minigamestructure.handlers.ChestSpawningHandler;
+import org.limaverse.minigamestructure.handlers.PlayerXpTimerHandler;
+import org.limaverse.minigamestructure.handlers.ResetHandler;
+import org.limaverse.minigamestructure.handlers.chesthandler.ChestHandler;
+import org.limaverse.minigamestructure.handlers.PlayerHandler;
 
 /**
  * The main class for the MiniGameStructure plugin.

@@ -1,4 +1,4 @@
-package org.test.minigamestructure.handlers;
+package org.limaverse.minigamestructure.handlers;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -6,7 +6,7 @@ import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.test.minigamestructure.MiniGameStructure;
+import org.limaverse.minigamestructure.MiniGameStructure;
 
 import java.io.File;
 import java.io.IOException;

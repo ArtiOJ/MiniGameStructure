@@ -1,14 +1,14 @@
-package org.test.minigamestructure.commands;
+package org.limaverse.minigamestructure.commands;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-import org.test.minigamestructure.MiniGameStructure;
-import org.test.minigamestructure.handlers.ResetHandler;
-import org.test.minigamestructure.handlers.chesthandler.ChestHandler;
-import org.test.minigamestructure.utilities.Colorize;
+import org.limaverse.minigamestructure.MiniGameStructure;
+import org.limaverse.minigamestructure.handlers.ResetHandler;
+import org.limaverse.minigamestructure.handlers.chesthandler.ChestHandler;
+import org.limaverse.minigamestructure.utilities.Colorize;
 
 import java.io.File;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package org.test.minigamestructure.handlers.chesthandler;
+package org.limaverse.minigamestructure.handlers.chesthandler;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -13,7 +13,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-import org.test.minigamestructure.MiniGameStructure;
+import org.limaverse.minigamestructure.MiniGameStructure;
 
 import java.io.File;
 import java.util.*;

@@ -1,4 +1,4 @@
-package org.test.minigamestructure.gameevents;
+package org.limaverse.minigamestructure.gameevents;
 
 import org.bukkit.Bukkit;
 import org.bukkit.block.Barrel;
@@ -17,7 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.test.minigamestructure.utilities.Colorize;
+import org.limaverse.minigamestructure.utilities.Colorize;
 
 
 public class GiveStartGameEffectsEvent implements Listener {

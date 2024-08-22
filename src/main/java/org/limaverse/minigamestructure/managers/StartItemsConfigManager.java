@@ -1,4 +1,4 @@
-package org.test.minigamestructure.managers;
+package org.limaverse.minigamestructure.managers;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.test.minigamestructure.MiniGameStructure;
+import org.limaverse.minigamestructure.MiniGameStructure;
 
 import java.io.File;
 import java.util.ArrayList;

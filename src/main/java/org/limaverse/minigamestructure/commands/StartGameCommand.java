@@ -1,4 +1,4 @@
-package org.test.minigamestructure.commands;
+package org.limaverse.minigamestructure.commands;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -11,13 +11,15 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.test.minigamestructure.MiniGameStructure;
-import org.test.minigamestructure.gameevents.*;
-import org.test.minigamestructure.handlers.ChestSpawningHandler;
-import org.test.minigamestructure.handlers.PlayerXpTimerHandler;
-import org.test.minigamestructure.handlers.chesthandler.ChestHandler;
-import org.test.minigamestructure.handlers.PlayerHandler;
-import org.test.minigamestructure.managers.StartItemsConfigManager;
+import org.limaverse.minigamestructure.MiniGameStructure;
+import org.limaverse.minigamestructure.gameevents.CountDownEvent;
+import org.limaverse.minigamestructure.gameevents.FreezePlayersEvent;
+import org.limaverse.minigamestructure.gameevents.GiveStartGameEffectsEvent;
+import org.limaverse.minigamestructure.handlers.ChestSpawningHandler;
+import org.limaverse.minigamestructure.handlers.PlayerXpTimerHandler;
+import org.limaverse.minigamestructure.handlers.chesthandler.ChestHandler;
+import org.limaverse.minigamestructure.handlers.PlayerHandler;
+import org.limaverse.minigamestructure.managers.StartItemsConfigManager;
 
 import java.util.List;
 

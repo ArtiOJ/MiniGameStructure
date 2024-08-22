@@ -1,10 +1,10 @@
-package org.test.minigamestructure.handlers;
+package org.limaverse.minigamestructure.handlers;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.test.minigamestructure.handlers.chesthandler.ChestHandler;
-import org.test.minigamestructure.utilities.Colorize;
+import org.limaverse.minigamestructure.handlers.chesthandler.ChestHandler;
+import org.limaverse.minigamestructure.utilities.Colorize;
 
 import java.io.File;
 import java.io.IOException;

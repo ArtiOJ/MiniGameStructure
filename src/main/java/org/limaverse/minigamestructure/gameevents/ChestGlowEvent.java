@@ -1,4 +1,4 @@
-package org.test.minigamestructure.gameevents;
+package org.limaverse.minigamestructure.gameevents;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -15,7 +15,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.ChatColor;
-import org.test.minigamestructure.utilities.Colorize;
+import org.limaverse.minigamestructure.utilities.Colorize;
 
 import java.util.ArrayList;
 

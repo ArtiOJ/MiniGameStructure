@@ -1,4 +1,4 @@
-package org.test.minigamestructure.handlers;
+package org.limaverse.minigamestructure.handlers;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -6,15 +6,13 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.type.Chest;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.inventory.meta.BlockDataMeta;
-import org.test.minigamestructure.MiniGameStructure;
-import org.test.minigamestructure.gameevents.ChestGlowEvent;
+import org.limaverse.minigamestructure.MiniGameStructure;
+import org.limaverse.minigamestructure.gameevents.ChestGlowEvent;
 
 import java.io.File;
 import java.io.IOException;
