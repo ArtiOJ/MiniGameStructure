@@ -70,11 +70,11 @@ public class StartGameCommand implements CommandExecutor {
             // Reset all chests
             chestHandler.resetChests();
             configManager.giveStartingItems();
-            // Start all timers after reset
+            // Reset Timers
+            playerXpTimerHandler.resetTimerAllTimers();
         });
 
         Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
-            playerXpTimerHandler.resetTimerAllTimers();
             playerXpTimerHandler.startTimersForAllPlayers();
         }, 20 * 20);
         // Schedule the start game effects on the main thread after 5 seconds (5 * 20 ticks).
