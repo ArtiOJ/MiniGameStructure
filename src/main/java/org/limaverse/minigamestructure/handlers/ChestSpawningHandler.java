@@ -22,6 +22,8 @@ public class ChestSpawningHandler {
     private static final String SPAWNS_FILE_NAME = "chest_group_spawns.yml";
     private final Random random = new Random();
     private final List<Location> platformLocations = new ArrayList<>();
+    private final List<Location> chestLocations = new ArrayList<>();
+    private final List<Location> selectedPlatformLocation = new ArrayList<>();
     private final int numberOfSpawns;
     private final int platformRadius;
     private FileConfiguration config;
@@ -83,6 +85,7 @@ public class ChestSpawningHandler {
             Location loc = platformLocations.get(i);
             String[] parts = config.getString("platform_spawns." + i).split(",");
             Material blockType = Material.valueOf(parts[3]);
+            selectedPlatformLocation.add(loc);
             generatePlatform(loc, blockType, platformRadius);
             spawnContainers(loc);
         }
@@ -157,6 +160,7 @@ public class ChestSpawningHandler {
                 chestData.setType(Chest.Type.LEFT);
                 block.setBlockData(chestData);
                 chestGlowEvent.summonGlowingMagmaCube(block.getLocation(), CHEST_GLOW_TIME);
+                chestLocations.add(block.getLocation());
 
                 Location adjacentLoc = null;
                 switch (face) {
@@ -183,14 +187,24 @@ public class ChestSpawningHandler {
                     adjacentChestData.setType(Chest.Type.RIGHT);
                     adjacentBlock.setBlockData(adjacentChestData);
                     chestGlowEvent.summonGlowingMagmaCube(adjacentBlock.getLocation(), CHEST_GLOW_TIME);
+                    chestLocations.add(block.getLocation());
                 }
             } else {
                 Directional directional = (Directional) block.getBlockData();
                 directional.setFacing(faces.get(random.nextInt(faces.size())));
                 block.setBlockData(directional);
                 chestGlowEvent.summonGlowingMagmaCube(block.getLocation(), CHEST_GLOW_TIME);
+                chestLocations.add(block.getLocation());
             }
         }
     }
 
+    public void deleteChestGroups() {
+        for (Location location : selectedPlatformLocation) {
+            generatePlatform(location, Material.AIR, platformRadius);
+        }
+        for (Location location : chestLocations) {
+            location.getBlock().setType(Material.AIR);
+        }
+    }
 }

@@ -60,6 +60,7 @@ public class StartGameCommand implements CommandExecutor {
             }
         }
 
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, chestSpawningHandler::deleteChestGroups);
 
         // Run player teleportation and chest spawning on the main thread.
         playerHandler.teleportPlayers();
@@ -76,9 +77,7 @@ public class StartGameCommand implements CommandExecutor {
             playerXpTimerHandler.resetTimerAllTimers();
         });
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
-            playerXpTimerHandler.startTimersForAllPlayers();
-        }, 20 * 20);
+        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, playerXpTimerHandler::startTimersForAllPlayers, 20 * 20);
         // Schedule the start game effects on the main thread after 5 seconds (5 * 20 ticks).
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             new GiveStartGameEffectsEvent(plugin, 12);
