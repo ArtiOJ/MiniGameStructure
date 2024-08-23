@@ -28,7 +28,7 @@ public class MiniGameStructure extends JavaPlugin {
         chestHandler = new ChestHandler(this);
         playerHandler = new PlayerHandler(this);
         chestSpawningHandler = new ChestSpawningHandler(this);
-        resetHandler = new ResetHandler(this, chestHandler);
+        resetHandler = new ResetHandler(this);
         playerXpTimerHandler = new PlayerXpTimerHandler(this);
         registerCommands();
     }
@@ -40,9 +40,10 @@ public class MiniGameStructure extends JavaPlugin {
         new StartGameCommand(this, playerHandler, chestHandler, chestSpawningHandler, playerXpTimerHandler);
         new SetPlayerSpawnCommand(this);
         new SetChestSpawnCommand(this, chestSpawningHandler);
-        new ResetMapCommand(this, chestHandler);
-        new ResetMapPreciseCommand(this, chestHandler);
+        new ResetMapCommand(this);
+        new ResetMapPreciseCommand(this);
         new ResetChestsCommand(this, chestHandler);
+        new ResetRandomCommand(this);
     }
 
     // Getters for the handlers, if needed

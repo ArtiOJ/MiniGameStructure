@@ -20,8 +20,8 @@ public class ResetMapCommand implements CommandExecutor, TabCompleter {
     private final MiniGameStructure plugin;
 
     // Constructor to initialize the ResetHandler and set the command executor and tab completer.
-    public ResetMapCommand(MiniGameStructure plugin, ChestHandler chestHandler) {
-        this.resetHandler = new ResetHandler(plugin, chestHandler);
+    public ResetMapCommand(MiniGameStructure plugin) {
+        this.resetHandler = new ResetHandler(plugin);
         this.plugin = plugin;
         plugin.getCommand("resetmap").setExecutor(this);
         plugin.getCommand("resetmap").setTabCompleter(this);

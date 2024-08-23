@@ -23,10 +23,9 @@ public class ResetMapPreciseCommand implements CommandExecutor, TabCompleter {
      * Constructor to initialize the ResetHandler and set the command executor and tab completer.
      *
      * @param plugin       The main plugin instance.
-     * @param chestHandler The ChestHandler instance.
      */
-    public ResetMapPreciseCommand(MiniGameStructure plugin, ChestHandler chestHandler) {
-        this.resetHandler = new ResetHandler(plugin, chestHandler);
+    public ResetMapPreciseCommand(MiniGameStructure plugin) {
+        this.resetHandler = new ResetHandler(plugin);
         this.plugin = plugin;
         plugin.getCommand("resetmapprecise").setExecutor(this);
         plugin.getCommand("resetmapprecise").setTabCompleter(this);
@@ -34,12 +33,6 @@ public class ResetMapPreciseCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        // Ensure the sender is a player.
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("This command can only be executed by a player.");
-            return true;
-        }
-
         // Check if the correct number of arguments is provided.
         if (args.length != 2) {
             sender.sendMessage("Usage: /resetmapprecise <map_name> <variation_name>");

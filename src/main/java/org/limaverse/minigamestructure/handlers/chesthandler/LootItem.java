@@ -1,22 +1,27 @@
 package org.limaverse.minigamestructure.handlers.chesthandler;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class LootItem {
     private final Material material;
     private final String customName;
     private final Map<Enchantment, Integer> enchantmentToLevelMap = new HashMap<>();
+    private final Map<Attribute, AttributeModifier> attributeToAttributeModifierMap = new HashMap<>();
+    private final List<ItemFlag> itemFlagsList = new ArrayList<>();
+    private boolean setUnbreakable;
     private final double chance;
     private final int minAmount;
     private final int maxAmount;
@@ -51,6 +56,40 @@ public class LootItem {
             }
         }
 
+        if (section.getBoolean("unbreakable")) {
+            setUnbreakable = true;
+        }
+
+        ConfigurationSection flagsSection = section.getConfigurationSection("flags");
+        if (flagsSection != null) {
+            List<String> flags = section.getStringList("flags");
+            for (String flag : flags) {
+                try {
+                    ItemFlag itemFlag = ItemFlag.valueOf(flag);
+                    itemFlagsList.add(itemFlag);
+                } catch (IllegalArgumentException e) {
+                    Bukkit.getLogger().severe("Invalid item flag: " + flag);
+                }
+            }
+        }
+
+        ConfigurationSection attributesSection = section.getConfigurationSection("attributes");
+        if (attributesSection != null) {
+            for (String attributeKey : attributesSection.getKeys(false)) {
+                try {
+                    Attribute attribute = Attribute.valueOf(attributeKey);
+                    double amountModifier = attributesSection.getDouble("amount");
+                    String operation = attributesSection.getString("operation", "ADD_NUMBER").toUpperCase();
+                    UUID uuid = UUID.randomUUID();
+
+                    AttributeModifier modifier = new AttributeModifier(uuid, attributeKey, amountModifier, AttributeModifier.Operation.valueOf(operation));
+                    attributeToAttributeModifierMap.put(attribute, modifier);
+                } catch (IllegalArgumentException e) {
+                    Bukkit.getLogger().severe("Invalid attribute or operation: " + attributeKey);
+                }
+            }
+        }
+
         this.chance = section.getDouble("chance");
         this.minAmount = section.getInt("minAmount");
         this.maxAmount = section.getInt("maxAmount");
@@ -80,6 +119,26 @@ public class LootItem {
                 );
             }
         }
+
+        if (setUnbreakable) {
+            itemMeta.setUnbreakable(true);
+        }
+
+        if (!itemFlagsList.isEmpty()) {
+            for (ItemFlag flag : itemFlagsList) {
+                itemMeta.addItemFlags(flag);
+            }
+        }
+
+        if (!attributeToAttributeModifierMap.isEmpty()) {
+            for (Map.Entry<Attribute, AttributeModifier> attributeEntry : attributeToAttributeModifierMap.entrySet()) {
+                itemMeta.addAttributeModifier(
+                        attributeEntry.getKey(),
+                        attributeEntry.getValue()
+                );
+            }
+        }
+
         itemStack.setItemMeta(itemMeta);
 
         return itemStack;

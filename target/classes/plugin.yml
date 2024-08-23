@@ -1,10 +1,11 @@
 name: MiniGameStructure
 version: '1.0-SNAPSHOT'
-main: org.test.minigamestructure.MiniGameStructure
+main: org.limaverse.minigamestructure.MiniGameStructure
 api-version: '1.20'
 load: POSTWORLD
 commands:
   resetmap:
+  resetrandom:
   startgame:
   resetchests:
   setplayerspawn:

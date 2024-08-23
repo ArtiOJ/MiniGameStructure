@@ -3,6 +3,7 @@ package org.limaverse.minigamestructure.handlers;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.limaverse.minigamestructure.MiniGameStructure;
 import org.limaverse.minigamestructure.handlers.chesthandler.ChestHandler;
 import org.limaverse.minigamestructure.utilities.Colorize;
 
@@ -17,12 +18,11 @@ import java.util.Random;
  * Handles the resetting of maps, including specific variations and chest states.
  */
 public class ResetHandler {
-    private final JavaPlugin plugin;
-    private final ChestHandler chestHandler;
+    private final MiniGameStructure plugin;
 
-    public ResetHandler(JavaPlugin plugin, ChestHandler chestHandler) {
+
+    public ResetHandler(MiniGameStructure plugin) {
         this.plugin = plugin;
-        this.chestHandler = chestHandler;
     }
 
     /**
@@ -49,9 +49,6 @@ public class ResetHandler {
 
         // Reset the map with the specified variation
         resetWorld(variationFolder);
-
-        // Reset chests after map reset
-        chestHandler.resetChests();
 
         // Notify about the restart requirement with countdown
         Bukkit.broadcastMessage(Colorize.format("&cThe map has been reset. Server will restart in 3 seconds..."));
@@ -87,7 +84,7 @@ public class ResetHandler {
         File selectedVariation = variations[new Random().nextInt(variations.length)];
 
         resetWorld(selectedVariation);
-        chestHandler.resetChests();
+
         Bukkit.broadcastMessage(Colorize.format("&cThe map has been reset to a random variation. Server will restart in 3 seconds..."));
 
         BukkitScheduler scheduler = Bukkit.getScheduler();
