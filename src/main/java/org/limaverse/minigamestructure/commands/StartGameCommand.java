@@ -60,10 +60,9 @@ public class StartGameCommand implements CommandExecutor {
             }
         }
 
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, chestSpawningHandler::deleteChestGroups);
-
         // Run player teleportation and chest spawning on the main thread.
         playerHandler.teleportPlayers();
+        chestSpawningHandler.deleteChestGroups();
         chestSpawningHandler.spawnChestPlatforms();
 
         // Run the events asynchronously.

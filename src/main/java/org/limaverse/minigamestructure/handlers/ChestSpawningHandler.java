@@ -187,7 +187,7 @@ public class ChestSpawningHandler {
                     adjacentChestData.setType(Chest.Type.RIGHT);
                     adjacentBlock.setBlockData(adjacentChestData);
                     chestGlowEvent.summonGlowingMagmaCube(adjacentBlock.getLocation(), CHEST_GLOW_TIME);
-                    chestLocations.add(block.getLocation());
+                    chestLocations.add(adjacentBlock.getLocation());
                 }
             } else {
                 Directional directional = (Directional) block.getBlockData();
@@ -200,6 +200,7 @@ public class ChestSpawningHandler {
     }
 
     public void deleteChestGroups() {
+        if (selectedPlatformLocation.isEmpty() || chestLocations.isEmpty()) return;
         for (Location location : selectedPlatformLocation) {
             generatePlatform(location, Material.AIR, platformRadius);
         }
