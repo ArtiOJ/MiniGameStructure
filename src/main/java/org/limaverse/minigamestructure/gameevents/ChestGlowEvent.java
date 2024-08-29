@@ -12,10 +12,10 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.ChatColor;
 import org.limaverse.minigamestructure.utilities.Colorize;
+import org.limaverse.minigamestructure.utilities.ScoreboardUtility;
 
 import java.util.ArrayList;
 
@@ -35,6 +35,13 @@ public class ChestGlowEvent implements Listener {
 
     public ChestGlowEvent(JavaPlugin plugin) {
         this.plugin = plugin;
+        this.magmaCubeTeam = ScoreboardUtility.getScoreboard().getTeam("magmaCubeTeam");
+
+        if (this.magmaCubeTeam == null) {
+            this.magmaCubeTeam = ScoreboardUtility.getScoreboard().registerNewTeam("magmaCubeTeam");
+            this.magmaCubeTeam.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
+        }
+
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
@@ -50,9 +57,6 @@ public class ChestGlowEvent implements Listener {
         magmaCube.setGlowing(true);
         magmaCube.setInvulnerable(true);
         magmaCubes.add(magmaCube);
-
-        // Set up the team for the magma cubes
-        setupMagmaCubeTeam();
 
         // Add the magma cube to the team
         magmaCubeTeam.addEntry(magmaCube.getUniqueId().toString());
@@ -86,16 +90,6 @@ public class ChestGlowEvent implements Listener {
         }
     }
 
-    private void setupMagmaCubeTeam() {
-        Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-        magmaCubeTeam = scoreboard.getTeam("magmaCubeTeam");
-
-        if (magmaCubeTeam == null) {
-            magmaCubeTeam = scoreboard.registerNewTeam("magmaCubeTeam");
-            magmaCubeTeam.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
-        }
-    }
-
     private void updateGlowingColor() {
         // Update the team color based on the current index
         if (colorIndex < colorSequence.length) {
@@ -117,3 +111,4 @@ public class ChestGlowEvent implements Listener {
         }
     }
 }
+
