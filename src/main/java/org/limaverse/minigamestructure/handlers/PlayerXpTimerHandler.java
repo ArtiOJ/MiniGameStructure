@@ -216,9 +216,7 @@ public class PlayerXpTimerHandler implements Listener {
 
     @EventHandler
     public void onPlayerHit(EntityDamageByEntityEvent event) {
-        if (event.getDamager() instanceof Player && event.getEntity() instanceof Player) {
-            Player damager = (Player) event.getDamager();
-            Player target = (Player) event.getEntity();
+        if (event.getDamager() instanceof Player damager && event.getEntity() instanceof Player target) {
 
             // Calculate the distance between the damager and the target
             double distance = damager.getLocation().distance(target.getLocation());
@@ -231,11 +229,9 @@ public class PlayerXpTimerHandler implements Listener {
     @EventHandler
     public void onProjectileHit(ProjectileHitEvent event) {
         Projectile projectile = event.getEntity();
-        if (projectile.getShooter() instanceof Player && event.getHitEntity() instanceof Player) {
+        if (projectile.getShooter() instanceof Player shooter && event.getHitEntity() instanceof Player target) {
 
-            Player shooter = (Player) projectile.getShooter();
-            Player target = (Player) event.getHitEntity();
-
+            if (shooter == target) return;
             // Calculate the distance between the shooter and the target
             double distance = shooter.getLocation().distance(target.getLocation());
 
