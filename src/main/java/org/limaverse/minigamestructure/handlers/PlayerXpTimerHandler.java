@@ -3,9 +3,12 @@ package org.limaverse.minigamestructure.handlers;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -13,9 +16,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class PlayerXpTimerHandler implements Listener {
     private final JavaPlugin plugin;
@@ -26,7 +27,7 @@ public class PlayerXpTimerHandler implements Listener {
     // Constants for the formula
     private final double multiplier;
     private final double constant;
-    private final int waterScail;
+    private final int waterScale;
     private BukkitTask runnable;
 
     public PlayerXpTimerHandler(JavaPlugin plugin) {
@@ -43,7 +44,7 @@ public class PlayerXpTimerHandler implements Listener {
         // Load formula constants from config
         multiplier = config.getDouble("xp_increase.formula.multiplier", 25);
         constant = config.getDouble("xp_increase.formula.constant", 50);
-        waterScail = config.getInt("xp_increase.formula.water_scale", 1);
+        waterScale = config.getInt("xp_increase.formula.water_scale", 1);
     }
 
     public void startTimersForAllPlayers() {
@@ -82,7 +83,6 @@ public class PlayerXpTimerHandler implements Listener {
                         continue;
                     }
 
-
                     applyEffects(player, timeLeft);
 
                     // Update the player's XP level to show remaining time
@@ -94,7 +94,7 @@ public class PlayerXpTimerHandler implements Listener {
                     if (!player.isInWater()) {
                         playerTimers.put(playerId, timeLeft - 1);
                     } else {
-                        playerTimers.put(playerId, timeLeft - waterScail);
+                        playerTimers.put(playerId, timeLeft - waterScale);
                     }
                 }
             }
@@ -227,5 +227,20 @@ public class PlayerXpTimerHandler implements Listener {
             increaseTimer(damager, distance);
         }
     }
-}
 
+    @EventHandler
+    public void onProjectileHit(ProjectileHitEvent event) {
+        Projectile projectile = event.getEntity();
+        if (projectile.getShooter() instanceof Player && event.getHitEntity() instanceof Player) {
+
+            Player shooter = (Player) projectile.getShooter();
+            Player target = (Player) event.getHitEntity();
+
+            // Calculate the distance between the shooter and the target
+            double distance = shooter.getLocation().distance(target.getLocation());
+
+            // Increase the timer for the shooter based on the distance
+            increaseTimer(shooter, distance);
+        }
+    }
+}
