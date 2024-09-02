@@ -1,0 +1,27 @@
+starting_effects:
+  speed:
+    effect: SPEED
+    duration: 20
+    amplifier: 1
+
+  invisibility:
+    effect: INVISIBILITY
+    duration: 20
+
+  glowing:
+    effect: GLOWING
+    duration: 20
+
+  saturation:
+    effect: SATURATION
+    duration: 20
+    amplifier: 20
+
+  absorption:
+    effect: ABSORPTION
+    duration: 20
+    amplifier: 5
+
+custom_effects:
+  no_damage:
+    duration: 20
