@@ -27,7 +27,7 @@ public class ChestHandler implements Listener {
     private final File loottablesFile;
 
     public ChestHandler(MiniGameStructure plugin) {
-        this.worldFolder = plugin.getServer().getWorld("world").getWorldFolder();
+        this.worldFolder = Bukkit.getWorld("game_map").getWorldFolder();
         File dataFolder = new File(worldFolder, "hunger_games_data");
         this.loottablesFile = new File(dataFolder, "loottables.yml");
 

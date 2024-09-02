@@ -14,15 +14,15 @@ import java.util.*;
 
 public class PlayerHandler {
     private final MiniGameStructure plugin;
-    private final World world;
     private File configFile;
     private FileConfiguration config;
     private static final String SPAWNS_FILE_NAME = "player_spawns.yml";
+    private final World world;
 
     public PlayerHandler(MiniGameStructure plugin) {
         this.plugin = plugin;
-        this.world = Bukkit.getWorld("world");
-        File dataFolder = new File(plugin.getServer().getWorld("world").getWorldFolder(), "hunger_games_data");
+        this.world = Bukkit.getWorld("game_map");
+        File dataFolder = new File(plugin.getServer().getWorld("game_map").getWorldFolder(), "hunger_games_data");
         configFile = new File(dataFolder, SPAWNS_FILE_NAME);
         config = YamlConfiguration.loadConfiguration(configFile);
 
@@ -105,6 +105,7 @@ public class PlayerHandler {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (iterator.hasNext()) {
                     Location spawnLocation = iterator.next();
+                    spawnLocation.setWorld(world);
                     player.teleport(spawnLocation);
                 }
             }

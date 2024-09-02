@@ -29,16 +29,17 @@ public class MiniGameStructure extends JavaPlugin {
      */
     @Override
     public void onEnable() {
+        resetHandler = new ResetHandler(this);
+        resetHandler.initWorld("game_map");
         chestHandler = new ChestHandler(this);
         playerHandler = new PlayerHandler(this);
         chestSpawningHandler = new ChestSpawningHandler(this);
-        resetHandler = new ResetHandler(this);
         playerXpTimerHandler = new PlayerXpTimerHandler(this);
 
         // Initialize StartGameEvent with necessary handlers
         startGameEvent = new StartGameEvent(this, playerHandler, chestHandler, chestSpawningHandler, playerXpTimerHandler);
         // Initialize GameStartHandler with conditions for starting the game
-        int maxPlayers = 10; // Replace with your actual max players value
+        int maxPlayers = 8; // Replace with your actual max players value
         long startDelay = 100L; // 5 seconds delay (100 ticks) after the lobby fills up
         long fallbackStartDelay = 20 * 300L; // 300 seconds fallback delay (6000 ticks) if the lobby doesn't fill up
         gameStartHandler = new GameStartHandler(this, startGameEvent, maxPlayers, startDelay, fallbackStartDelay);

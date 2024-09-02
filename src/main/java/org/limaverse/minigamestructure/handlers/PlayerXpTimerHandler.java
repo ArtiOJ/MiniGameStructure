@@ -32,7 +32,7 @@ public class PlayerXpTimerHandler implements Listener {
 
     public PlayerXpTimerHandler(JavaPlugin plugin) {
         this.plugin = plugin;
-        File dataFolder = new File(plugin.getServer().getWorld("world").getWorldFolder(), "hunger_games_data");
+        File dataFolder = new File(plugin.getServer().getWorld("game_map").getWorldFolder(), "hunger_games_data");
         configFile = new File(dataFolder, "timer.yml");
         config = YamlConfiguration.loadConfiguration(configFile);
 

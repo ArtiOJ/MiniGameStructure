@@ -1,10 +1,13 @@
 package org.limaverse.minigamestructure.handlers;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.limaverse.minigamestructure.gameevents.StartGameEvent;
@@ -27,6 +30,7 @@ public class GameStartHandler implements Listener {
 
     private Scoreboard scoreboard;
     private Objective objective;
+    private World startWorld;
 
     public GameStartHandler(Plugin plugin, StartGameEvent startGameEvent, int maxPlayers, long startDelay, long fallbackStartDelay) {
         this.plugin = plugin;
@@ -35,6 +39,7 @@ public class GameStartHandler implements Listener {
         this.startDelay = startDelay;
         this.fallbackStartDelay = fallbackStartDelay;
 
+        startWorld = Bukkit.getWorld("world");
         // Register this class as an event listener
         Bukkit.getPluginManager().registerEvents(this, plugin);
 
@@ -63,6 +68,11 @@ public class GameStartHandler implements Listener {
         currentPlayerCount++;
         updateScoreboard(getStatusMessage());
         checkStartConditions();
+        event.getPlayer().getInventory().clear();
+        event.getPlayer().getInventory().setArmorContents(null);
+        event.getPlayer().setGameMode(GameMode.ADVENTURE);
+        event.getPlayer().teleport(startWorld.getSpawnLocation());
+        event.getPlayer().setAllowFlight(true);
     }
 
     @EventHandler
@@ -78,7 +88,7 @@ public class GameStartHandler implements Listener {
         if (currentPlayerCount >= maxPlayers) {
             if (countdownTask != null) countdownTask.cancel();
             countdownTask = Bukkit.getScheduler().runTaskTimer(plugin, this::countdown, 0L, 20L);
-        } else if (currentPlayerCount > maxPlayers / 2) {
+        } else if (currentPlayerCount >= maxPlayers / 2) {
             if (!fallbackTimerStarted) {
                 fallbackTimerStarted = true;
                 Bukkit.getScheduler().runTaskLater(plugin, this::startGameIfNotStarted, fallbackStartDelay);
@@ -87,7 +97,7 @@ public class GameStartHandler implements Listener {
     }
 
     private void checkFallbackTimer() {
-        if (fallbackTimerStarted && currentPlayerCount <= maxPlayers / 2) {
+        if (fallbackTimerStarted && currentPlayerCount >= maxPlayers / 2) {
             fallbackTimerStarted = false;
             Bukkit.getScheduler().cancelTasks(plugin);
         }
@@ -131,9 +141,5 @@ public class GameStartHandler implements Listener {
         } else {
             return "Waiting on players!";
         }
-    }
-
-    public Scoreboard getScoreboard() {
-        return scoreboard;
     }
 }

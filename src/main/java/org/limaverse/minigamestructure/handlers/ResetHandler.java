@@ -1,11 +1,13 @@
 package org.limaverse.minigamestructure.handlers;
 
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
+import org.bukkit.WorldType;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.limaverse.minigamestructure.MiniGameStructure;
-import org.limaverse.minigamestructure.handlers.chesthandler.ChestHandler;
 import org.limaverse.minigamestructure.utilities.Colorize;
+import org.limaverse.minigamestructure.utilities.WorldChanger;
 
 import java.io.File;
 import java.io.IOException;
@@ -100,7 +102,7 @@ public class ResetHandler {
      * @param mapFolder The folder containing the map data.
      */
     private void resetWorld(File mapFolder) {
-        File worldFolder = new File(Bukkit.getWorldContainer(), plugin.getServer().getWorlds().get(0).getName());
+        File worldFolder = new File(Bukkit.getWorldContainer(), "game_map");
 
         // Notify the player about the reset
         Bukkit.broadcastMessage(Colorize.format("&aResetting the map..."));
@@ -138,4 +140,27 @@ public class ResetHandler {
             }
         });
     }
+
+
+
+    public void initWorld(String worldName) {
+        World world = Bukkit.getWorld(worldName);
+
+        // If the world doesn't exist, create and load it
+        if (world == null) {
+            WorldCreator worldCreator = new WorldCreator(worldName);
+
+            world = worldCreator.createWorld();
+        }
+
+        // Ensure the world is loaded
+        if (world != null) {
+            // The world is now loaded and can be used
+            Bukkit.getLogger().info("World " + worldName + " is ready!");
+        } else {
+            Bukkit.getLogger().severe("Failed to load or create world " + worldName + "!");
+        }
+    }
 }
+
+
