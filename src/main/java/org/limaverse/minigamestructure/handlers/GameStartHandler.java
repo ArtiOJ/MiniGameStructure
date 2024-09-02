@@ -7,7 +7,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.limaverse.minigamestructure.gameevents.StartGameEvent;
@@ -32,14 +31,14 @@ public class GameStartHandler implements Listener {
     private Objective objective;
     private World startWorld;
 
-    public GameStartHandler(Plugin plugin, StartGameEvent startGameEvent, int maxPlayers, long startDelay, long fallbackStartDelay) {
+    public GameStartHandler(Plugin plugin, StartGameEvent startGameEvent, long startDelay, long fallbackStartDelay) {
         this.plugin = plugin;
         this.startGameEvent = startGameEvent;
-        this.maxPlayers = maxPlayers;
+        this.maxPlayers = Bukkit.getMaxPlayers();
         this.startDelay = startDelay;
         this.fallbackStartDelay = fallbackStartDelay;
-
         startWorld = Bukkit.getWorld("world");
+
         // Register this class as an event listener
         Bukkit.getPluginManager().registerEvents(this, plugin);
 
@@ -65,6 +64,9 @@ public class GameStartHandler implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
+        if (gameStarted) {
+            event.getPlayer().kickPlayer("&cA game is in progress!");
+        }
         currentPlayerCount++;
         updateScoreboard(getStatusMessage());
         checkStartConditions();
@@ -79,28 +81,37 @@ public class GameStartHandler implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         currentPlayerCount--;
         updateScoreboard(getStatusMessage());
-        checkFallbackTimer();
+        checkStartConditions(); // Check start conditions after a player leaves
     }
 
     public void checkStartConditions() {
         if (gameStarted) return;
 
         if (currentPlayerCount >= maxPlayers) {
-            if (countdownTask != null) countdownTask.cancel();
-            countdownTask = Bukkit.getScheduler().runTaskTimer(plugin, this::countdown, 0L, 20L);
+            startCountdown(startDelay);
         } else if (currentPlayerCount >= maxPlayers / 2) {
             if (!fallbackTimerStarted) {
                 fallbackTimerStarted = true;
-                Bukkit.getScheduler().runTaskLater(plugin, this::startGameIfNotStarted, fallbackStartDelay);
+                startCountdown(fallbackStartDelay);
             }
+        } else {
+            stopCountdown();
+            fallbackTimerStarted = false;
         }
     }
 
-    private void checkFallbackTimer() {
-        if (fallbackTimerStarted && currentPlayerCount >= maxPlayers / 2) {
-            fallbackTimerStarted = false;
-            Bukkit.getScheduler().cancelTasks(plugin);
+    private void startCountdown(long delay) {
+        if (countdownTask != null) countdownTask.cancel();
+        startDelay = delay; // Set the delay for countdown
+        countdownTask = Bukkit.getScheduler().runTaskTimer(plugin, this::countdown, 0L, 20L);
+    }
+
+    private void stopCountdown() {
+        if (countdownTask != null) {
+            countdownTask.cancel();
+            countdownTask = null;
         }
+        updateScoreboard(getStatusMessage());
     }
 
     private void countdown() {
@@ -109,6 +120,11 @@ public class GameStartHandler implements Listener {
         if (secondsLeft > 0) {
             updateScoreboard("Starting in " + secondsLeft + " seconds...");
             startDelay -= 20;
+
+            // Check if player count drops below the required amount during countdown
+            if (currentPlayerCount < (fallbackTimerStarted ? maxPlayers / 2 : maxPlayers)) {
+                stopCountdown();
+            }
         } else {
             startGame();
         }
@@ -136,7 +152,7 @@ public class GameStartHandler implements Listener {
     private String getStatusMessage() {
         if (currentPlayerCount >= maxPlayers) {
             return "Starting in " + startDelay / 20 + " seconds...";
-        } else if (currentPlayerCount > maxPlayers / 2) {
+        } else if (currentPlayerCount >= maxPlayers / 2) {
             return "Early start possible, waiting on players!";
         } else {
             return "Waiting on players!";

@@ -131,10 +131,20 @@ public class PlayerXpTimerHandler implements Listener {
                 int effectLevel = scaling ? Math.min(maxLevel, maxLevel * (startTime - timeLeft) / startTime) : maxLevel;
                 PotionEffectType potionEffectType = PotionEffectType.getByName(type.toUpperCase());
 
-                if (potionEffectType != null) {
-                    player.addPotionEffect(new PotionEffect(potionEffectType, 40, effectLevel, true, true));
-                } else {
+                if (potionEffectType == null) {
                     plugin.getLogger().severe("Invalid effect type: " + type + " for effect " + effectKey);
+                    return;
+                }
+
+                if (player.getPotionEffect(potionEffectType) == null) {
+                    player.addPotionEffect(new PotionEffect(potionEffectType, 5 * 20, effectLevel, true, true));
+                }
+
+                for (PotionEffect effect : player.getActivePotionEffects()) {
+                    if (!effect.getType().equals(potionEffectType)) continue;
+                    if (effect.getDuration() / 20 <= 1) {
+                        player.addPotionEffect(new PotionEffect(potionEffectType, 5 * 20, effect.getAmplifier() - 1, true, true));
+                    }
                 }
             }
         }
@@ -168,6 +178,7 @@ public class PlayerXpTimerHandler implements Listener {
         }
 
         for (PotionEffect effect : player.getActivePotionEffects()) {
+            if (!effect.getType().equals(potionEffectType)) continue;
             if (effect.getDuration() / 20 <= 1) {
                 player.addPotionEffect(new PotionEffect(potionEffectType, duration * 20, level - 1, true, true));
             }
