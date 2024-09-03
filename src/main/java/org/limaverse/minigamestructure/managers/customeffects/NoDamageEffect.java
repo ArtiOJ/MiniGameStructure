@@ -29,9 +29,21 @@ public class NoDamageEffect implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                noDamagePlayers.remove(player);
+                removeEffect(player);
             }
         }.runTaskLater(plugin, duration * 20L); // Convert duration to ticks
+    }
+
+    public void removeEffect(Player player) {
+        noDamagePlayers.remove(player);
+    }
+
+    public boolean hasEffect(Player player) {
+        return noDamagePlayers.contains(player);
+    }
+
+    public void removeAllEffects() {
+        noDamagePlayers.clear();
     }
 
     @EventHandler
@@ -44,3 +56,4 @@ public class NoDamageEffect implements Listener {
         }
     }
 }
+
