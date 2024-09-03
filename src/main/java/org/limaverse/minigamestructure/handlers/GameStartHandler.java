@@ -5,18 +5,23 @@ import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
+import org.limaverse.minigamestructure.MiniGameStructure;
 import org.limaverse.minigamestructure.gameevents.StartGameEvent;
 import org.limaverse.minigamestructure.utilities.Colorize;
 import org.limaverse.minigamestructure.utilities.ScoreboardUtility;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Objective;
+import org.limaverse.minigamestructure.utilities.WorldChanger;
 
 public class GameStartHandler implements Listener {
-    private final Plugin plugin;
+    private final MiniGameStructure plugin;
     private final StartGameEvent startGameEvent;
     private final int maxPlayers;
     private long startDelay;
@@ -26,17 +31,18 @@ public class GameStartHandler implements Listener {
     private boolean gameStarted = false;
     private boolean fallbackTimerStarted = false;
     private BukkitTask countdownTask;
-
     private Scoreboard scoreboard;
     private Objective objective;
     private World startWorld;
+    private BukkitScheduler scheduler;
 
-    public GameStartHandler(Plugin plugin, StartGameEvent startGameEvent, long startDelay, long fallbackStartDelay) {
+    public GameStartHandler(MiniGameStructure plugin, StartGameEvent startGameEvent, long startDelay, long fallbackStartDelay) {
         this.plugin = plugin;
         this.startGameEvent = startGameEvent;
         this.maxPlayers = Bukkit.getMaxPlayers();
         this.startDelay = startDelay;
         this.fallbackStartDelay = fallbackStartDelay;
+        this.scheduler = Bukkit.getScheduler();
         startWorld = Bukkit.getWorld("world");
 
         // Register this class as an event listener
@@ -65,13 +71,14 @@ public class GameStartHandler implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         if (gameStarted) {
-            event.getPlayer().kickPlayer("&cA game is in progress!");
+            event.getPlayer().kickPlayer("A game is in progress!");
         }
         currentPlayerCount++;
         updateScoreboard(getStatusMessage());
         checkStartConditions();
         event.getPlayer().getInventory().clear();
         event.getPlayer().getInventory().setArmorContents(null);
+        event.getPlayer().clearActivePotionEffects();
         event.getPlayer().setGameMode(GameMode.ADVENTURE);
         event.getPlayer().teleport(startWorld.getSpawnLocation());
         event.getPlayer().setAllowFlight(true);
@@ -84,10 +91,26 @@ public class GameStartHandler implements Listener {
         checkStartConditions(); // Check start conditions after a player leaves
     }
 
+    @EventHandler
+    public void onPlayerDeath(PlayerRespawnEvent event) {
+        if (gameStarted) {
+            scheduler.runTaskLater(plugin, () -> {
+                event.getPlayer().setGameMode(GameMode.SPECTATOR);
+                WorldChanger worldChanger = new WorldChanger(plugin);
+                worldChanger.setWorld("game_map", event.getPlayer());
+            }, 5);
+        } else {
+            scheduler.runTaskLater(plugin, () -> {
+                event.getPlayer().setGameMode(GameMode.ADVENTURE);
+                event.getPlayer().setAllowFlight(true);
+            }, 5);
+        }
+    }
+
     public void checkStartConditions() {
         if (gameStarted) return;
 
-        if (currentPlayerCount >= maxPlayers) {
+        if (currentPlayerCount == maxPlayers) {
             startCountdown(startDelay);
         } else if (currentPlayerCount >= maxPlayers / 2) {
             if (!fallbackTimerStarted) {
@@ -102,8 +125,13 @@ public class GameStartHandler implements Listener {
 
     private void startCountdown(long delay) {
         if (countdownTask != null) countdownTask.cancel();
-        startDelay = delay; // Set the delay for countdown
-        countdownTask = Bukkit.getScheduler().runTaskTimer(plugin, this::countdown, 0L, 20L);
+
+        // Only reset startDelay if the countdown is not already running
+        if (countdownTask == null || countdownTask.isCancelled()) {
+            startDelay = delay; // Set the delay for countdown
+        }
+
+        countdownTask = scheduler.runTaskTimer(plugin, this::countdown, 0L, 20L);
     }
 
     private void stopCountdown() {
@@ -137,20 +165,20 @@ public class GameStartHandler implements Listener {
         clearScoreboard();
     }
 
-    private void startGameIfNotStarted() {
-        if (!gameStarted) {
-            startGame();
-        }
-    }
-
     private void clearScoreboard() {
         for (var player : Bukkit.getOnlinePlayers()) {
             player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
         }
     }
 
+    public void forceStart() {
+        gameStarted = true;
+        startGameEvent.startGame();
+    }
+    
+
     private String getStatusMessage() {
-        if (currentPlayerCount >= maxPlayers) {
+        if (currentPlayerCount == maxPlayers) {
             return "Starting in " + startDelay / 20 + " seconds...";
         } else if (currentPlayerCount >= maxPlayers / 2) {
             return "Early start possible, waiting on players!";
