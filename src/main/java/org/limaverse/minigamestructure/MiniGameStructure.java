@@ -39,8 +39,8 @@ public class MiniGameStructure extends JavaPlugin {
         // Initialize StartGameEvent with necessary handlers
         startGameEvent = new StartGameEvent(this, playerHandler, chestHandler, chestSpawningHandler, playerXpTimerHandler);
         // Initialize GameStartHandler with conditions for starting the game
-        long startDelay = 100L; // 5 seconds delay (100 ticks) after the lobby fills up
-        long fallbackStartDelay = 20 * 300L; // 300 seconds fallback delay (6000 ticks) if the lobby doesn't fill up
+        long startDelay = 5 * 20; // 5 seconds delay (100 ticks) after the lobby fills up
+        long fallbackStartDelay = 20 * 20L; // 300 seconds fallback delay (6000 ticks) if the lobby doesn't fill up
         gameStartHandler = new GameStartHandler(this, startGameEvent, startDelay, fallbackStartDelay);
 
         // Schedule periodic checks for game start conditions
@@ -53,7 +53,7 @@ public class MiniGameStructure extends JavaPlugin {
      * Registers all commands used in the plugin.
      */
     private void registerCommands() {
-        new StartGameCommand(this, startGameEvent);
+        new StartGameCommand(this, gameStartHandler);
         new SetPlayerSpawnCommand(this);
         new SetChestSpawnCommand(this, chestSpawningHandler);
         new ResetMapCommand(this);
