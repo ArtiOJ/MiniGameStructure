@@ -6,21 +6,22 @@ import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.limaverse.minigamestructure.MiniGameStructure;
 import org.limaverse.minigamestructure.gameevents.StartGameEvent;
+import org.limaverse.minigamestructure.handlers.GameStartHandler;
 
 import java.util.List;
 
 public class StartGameCommand implements CommandExecutor {
-    private final StartGameEvent startGameEvent;
+    private final GameStartHandler gameStartHandler;
 
-    public StartGameCommand(MiniGameStructure plugin, StartGameEvent startGameEvent) {
-        this.startGameEvent = startGameEvent;
+    public StartGameCommand(MiniGameStructure plugin, GameStartHandler gameStartHandler) {
+        this.gameStartHandler = gameStartHandler;
         plugin.getCommand("startgame").setExecutor(this);
     }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         // Run player-related tasks on the main thread as they interact with Bukkit API.
-        startGameEvent.startGame();
+        gameStartHandler.forceStart();
         return true;
     }
 }
