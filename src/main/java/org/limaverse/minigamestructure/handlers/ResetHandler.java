@@ -1,9 +1,6 @@
 package org.limaverse.minigamestructure.handlers;
 
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.WorldCreator;
-import org.bukkit.WorldType;
+import org.bukkit.*;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.limaverse.minigamestructure.MiniGameStructure;
 import org.limaverse.minigamestructure.utilities.Colorize;
@@ -153,6 +150,7 @@ public class ResetHandler {
             world = worldCreator.createWorld();
         }
 
+        world.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
         // Ensure the world is loaded
         if (world != null) {
             // The world is now loaded and can be used
