@@ -108,6 +108,7 @@ public class ChestGlowEvent implements Listener {
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         if (event.getRightClicked() instanceof MagmaCube) {
             event.getPlayer().sendMessage(Colorize.format("&cChests are locked for &e" + timeLeft + "&c seconds."));
+            event.setCancelled(true);
         }
     }
 }
