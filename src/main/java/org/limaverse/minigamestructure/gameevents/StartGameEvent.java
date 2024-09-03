@@ -4,9 +4,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.block.Barrel;
+import org.bukkit.block.DoubleChest;
+import org.bukkit.block.data.type.Chest;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.inventory.InventoryHolder;
 import org.limaverse.minigamestructure.MiniGameStructure;
 import org.limaverse.minigamestructure.handlers.ChestSpawningHandler;
 import org.limaverse.minigamestructure.handlers.PlayerXpTimerHandler;
@@ -18,12 +25,13 @@ import org.limaverse.minigamestructure.utilities.WorldChanger;
 
 import java.util.List;
 
-public class StartGameEvent {
+public class StartGameEvent implements Listener {
     private final MiniGameStructure plugin;
     private final PlayerHandler playerHandler;
     private final ChestHandler chestHandler;
     private final ChestSpawningHandler chestSpawningHandler;
     private final PlayerXpTimerHandler playerXpTimerHandler;
+    boolean allowChests = false;
 
     public StartGameEvent(MiniGameStructure plugin, PlayerHandler playerHandler, ChestHandler chestHandler, ChestSpawningHandler chestSpawningHandler, PlayerXpTimerHandler playerXpTimerHandler) {
         this.plugin = plugin;
@@ -31,6 +39,8 @@ public class StartGameEvent {
         this.chestHandler = chestHandler;
         this.chestSpawningHandler = chestSpawningHandler;
         this.playerXpTimerHandler = playerXpTimerHandler;
+
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     public void startGame() {
@@ -38,7 +48,9 @@ public class StartGameEvent {
         World world = plugin.getServer().getWorld("game_map");
         WorldChanger worldChanger = new WorldChanger(plugin);
         worldChanger.setWorldAllPlayers("game_map");
+
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            allowChests = true;
             StartItemsConfigManager configManager = new StartItemsConfigManager(plugin);
             for (Player player : Bukkit.getOnlinePlayers()) {
                 player.getInventory().clear();
@@ -79,5 +91,13 @@ public class StartGameEvent {
                 manager.giveStartingEffects();
             }, 5 * 20);
         }, 10 * 20);
+    }
+
+    @EventHandler
+    public void onChestOpen(InventoryOpenEvent event) {
+        InventoryHolder holder = event.getInventory().getHolder();
+        if ((holder instanceof Chest || holder instanceof Barrel || holder instanceof DoubleChest) && !allowChests) {
+            event.setCancelled(true);
+        }
     }
 }
