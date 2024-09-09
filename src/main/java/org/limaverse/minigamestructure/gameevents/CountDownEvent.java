@@ -4,10 +4,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
-public class CountDownEvent {
+
+public class CountDownEvent implements Listener {
     private final JavaPlugin plugin;
     private final int startCount;
     private final Sound sound;
@@ -17,6 +22,7 @@ public class CountDownEvent {
         this.startCount = startCount;
         this.sound = sound;
         startCountdown();
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     private void startCountdown() {
@@ -30,6 +36,7 @@ public class CountDownEvent {
                         title = getColorForCount(count) + count;
                     } else {
                         title = ChatColor.GREEN + "GO!";
+                        HandlerList.unregisterAll(this);
                     }
                     player.sendTitle(title, "", 1, 10, 10);
                     if (sound != null) {
@@ -48,5 +55,10 @@ public class CountDownEvent {
         } else {
             return ChatColor.RED.toString();
         }
+    }
+
+    @EventHandler
+    public void onBlockPlace(BlockPlaceEvent event) {
+        event.setCancelled(true);
     }
 }

@@ -3,13 +3,12 @@ package org.limaverse.minigamestructure.handlers;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 import org.limaverse.minigamestructure.MiniGameStructure;
@@ -18,7 +17,10 @@ import org.limaverse.minigamestructure.utilities.Colorize;
 import org.limaverse.minigamestructure.utilities.ScoreboardUtility;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Objective;
-import org.limaverse.minigamestructure.utilities.WorldChanger;
+import org.bukkit.scoreboard.DisplaySlot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameStartHandler implements Listener {
     private final MiniGameStructure plugin;
@@ -34,7 +36,9 @@ public class GameStartHandler implements Listener {
     private Scoreboard scoreboard;
     private Objective objective;
     private World startWorld;
+    private World gameWorld; // Add the game world reference
     private BukkitScheduler scheduler;
+    private List<Player> spectatingPlayers = new ArrayList<>(); // List to store spectating players
 
     public GameStartHandler(MiniGameStructure plugin, StartGameEvent startGameEvent, long startDelay, long fallbackStartDelay) {
         this.plugin = plugin;
@@ -44,6 +48,7 @@ public class GameStartHandler implements Listener {
         this.fallbackStartDelay = fallbackStartDelay;
         this.scheduler = Bukkit.getScheduler();
         startWorld = Bukkit.getWorld("world");
+        gameWorld = Bukkit.getWorld("game_map"); // Assign the game world
 
         // Register this class as an event listener
         Bukkit.getPluginManager().registerEvents(this, plugin);
@@ -70,41 +75,59 @@ public class GameStartHandler implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+
         if (gameStarted) {
-            event.getPlayer().kickPlayer("A game is in progress!");
+            // Send the player to the game world in spectator mode and add them to spectatingPlayers
+            player.setGameMode(GameMode.SPECTATOR);
+            player.teleport(gameWorld.getSpawnLocation());
+            spectatingPlayers.add(player);
+        } else {
+            currentPlayerCount++;
+            updateScoreboard(getStatusMessage());
+            checkStartConditions();
+            player.getInventory().clear();
+            player.getInventory().setArmorContents(null);
+            player.clearActivePotionEffects();
+            player.setGameMode(GameMode.ADVENTURE);
+            player.teleport(startWorld.getSpawnLocation());
+            player.setAllowFlight(true);
         }
-        currentPlayerCount++;
-        updateScoreboard(getStatusMessage());
-        checkStartConditions();
-        event.getPlayer().getInventory().clear();
-        event.getPlayer().getInventory().setArmorContents(null);
-        event.getPlayer().clearActivePotionEffects();
-        event.getPlayer().setGameMode(GameMode.ADVENTURE);
-        event.getPlayer().teleport(startWorld.getSpawnLocation());
-        event.getPlayer().setAllowFlight(true);
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        currentPlayerCount--;
-        updateScoreboard(getStatusMessage());
-        checkStartConditions(); // Check start conditions after a player leaves
+        Player player = event.getPlayer();
+
+        if (spectatingPlayers.contains(player)) {
+            spectatingPlayers.remove(player); // Remove the player from the spectating list if they leave
+        } else {
+            currentPlayerCount--;
+            updateScoreboard(getStatusMessage());
+            checkStartConditions(); // Check start conditions after a player leaves
+        }
     }
 
     @EventHandler
-    public void onPlayerDeath(PlayerRespawnEvent event) {
+    public void onPlayerRespawn(PlayerRespawnEvent event) {
+        Player player = event.getPlayer();
+
         if (gameStarted) {
             scheduler.runTaskLater(plugin, () -> {
-                event.getPlayer().setGameMode(GameMode.SPECTATOR);
-                WorldChanger worldChanger = new WorldChanger(plugin);
-                worldChanger.setWorld("game_map", event.getPlayer());
+                player.setGameMode(GameMode.SPECTATOR);
+                player.teleport(gameWorld.getSpawnLocation());
+                spectatingPlayers.add(player); // Add player to spectating list on respawn
             }, 5);
         } else {
             scheduler.runTaskLater(plugin, () -> {
-                event.getPlayer().setGameMode(GameMode.ADVENTURE);
-                event.getPlayer().setAllowFlight(true);
+                player.setGameMode(GameMode.ADVENTURE);
+                player.setAllowFlight(true);
             }, 5);
         }
+    }
+
+    public List<Player> getSpectatingPlayers() {
+        return new ArrayList<>(spectatingPlayers); // Return a copy of the list to prevent external modification
     }
 
     public void checkStartConditions() {
@@ -167,15 +190,19 @@ public class GameStartHandler implements Listener {
 
     private void clearScoreboard() {
         for (var player : Bukkit.getOnlinePlayers()) {
-            player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+            Scoreboard playerScoreboard = player.getScoreboard();
+            Objective sidebarObjective = playerScoreboard.getObjective(DisplaySlot.SIDEBAR);
+            if (sidebarObjective != null) {
+                sidebarObjective.unregister(); // Unregister the sidebar objective, clearing only the sidebar
+            }
         }
     }
+
 
     public void forceStart() {
         gameStarted = true;
         startGameEvent.startGame();
     }
-    
 
     private String getStatusMessage() {
         if (currentPlayerCount == maxPlayers) {

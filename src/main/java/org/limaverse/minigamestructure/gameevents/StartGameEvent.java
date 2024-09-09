@@ -90,7 +90,7 @@ public class StartGameEvent implements Listener {
                 StartEffectsConfigManager manager = new StartEffectsConfigManager(plugin);
                 manager.giveStartingEffects();
             }, 5 * 20);
-        }, 10 * 20);
+        }, 4 * 20);
     }
 
     @EventHandler

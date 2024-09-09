@@ -18,13 +18,16 @@ import org.limaverse.minigamestructure.utilities.Colorize;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class StartEffectsConfigManager implements Listener {
     private final MiniGameStructure plugin;
     private final File file;
     private final YamlConfiguration config;
     private final NoDamageEffect noDamageEffect;
+    private Map<PotionEffectType, Boolean> naturalRemoval = new HashMap<>();
 
     public StartEffectsConfigManager(MiniGameStructure plugin) {
         this.plugin = plugin;
@@ -56,7 +59,8 @@ public class StartEffectsConfigManager implements Listener {
                     logError("Invalid effect: " + effectName, key);
                     continue; // Skip invalid effect
                 }
-
+                boolean onlyNaturalRemoval = config.getBoolean("starting_effects." + key + ".unnatural-removal", true);
+                naturalRemoval.put(effectType, onlyNaturalRemoval);
                 int durationSeconds = config.getInt("starting_effects." + key + ".duration", 30); // default 30 seconds
                 int amplifier = config.getInt("starting_effects." + key + ".amplifier", 0); // default amplifier level 0
 
@@ -79,26 +83,33 @@ public class StartEffectsConfigManager implements Listener {
 
     private void removeEffectsFromPlayer(Player player) {
         // Removing standard potion effects
+        boolean sendMessage = false;
         if (config.contains("starting_effects")) {
             for (String key : config.getConfigurationSection("starting_effects").getKeys(false)) {
                 String effectName = config.getString("starting_effects." + key + ".effect");
                 PotionEffectType effectType = PotionEffectType.getByName(effectName);
-                if (effectType != null) {
-                    player.removePotionEffect(effectType);
-                } else {
-                    logError("Invalid effect: " + effectName, key);
+                if (effectType != null && naturalRemoval.get(effectType)) {
+                    // Check if the player actually has the effect before removing it
+                    if (player.hasPotionEffect(effectType)) {
+                        sendMessage = true;
+                        player.removePotionEffect(effectType);
+                    }
                 }
             }
         }
 
         // Removing no damage effect if it exists
-        if (noDamageEffect != null) {
+        if (noDamageEffect != null && noDamageEffect.hasEffect(player)) {
             noDamageEffect.removeEffect(player);
+            sendMessage = true;
         }
 
-        // Send a message to the player
-        player.sendMessage(Colorize.format("&cYour effects have expired!"));
+        // Send a message to the player if effects were removed
+        if (sendMessage) {
+            player.sendMessage(Colorize.format("&cYour effects have expired!"));
+        }
     }
+
 
     @EventHandler
     public void onPlayerHurt(EntityDamageEvent event) {
@@ -118,7 +129,7 @@ public class StartEffectsConfigManager implements Listener {
                         (noDamageEffect != null && noDamageEffect.hasEffect(target));
 
                 // If attacker has effects and target doesn't, remove effects from attacker
-                if (attackerHasEffects && !targetHasEffects) {
+                if ((attackerHasEffects && !targetHasEffects)) {
                     removeEffectsFromPlayer(attacker);
                 }
             }

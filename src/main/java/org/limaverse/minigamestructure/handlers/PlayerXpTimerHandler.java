@@ -1,12 +1,16 @@
 package org.limaverse.minigamestructure.handlers;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -29,12 +33,14 @@ public class PlayerXpTimerHandler implements Listener {
     private final double constant;
     private final int waterScale;
     private BukkitTask runnable;
+    private boolean allowNaturalRegin = true;
 
     public PlayerXpTimerHandler(JavaPlugin plugin) {
         this.plugin = plugin;
         File dataFolder = new File(plugin.getServer().getWorld("game_map").getWorldFolder(), "hunger_games_data");
         configFile = new File(dataFolder, "timer.yml");
         config = YamlConfiguration.loadConfiguration(configFile);
+        allowNaturalRegin = config.getBoolean("timer.end_action.allow_natural_regin", true);
 
         // Error: Check if config is missing
         if (!configFile.exists()) {
@@ -55,6 +61,7 @@ public class PlayerXpTimerHandler implements Listener {
             plugin.getLogger().severe("Timer duration is missing or invalid in the config. Please check 'timer.duration'.");
             return;
         }
+        startSpawnIncreaseTimer(1);
 
         Bukkit.getPluginManager().registerEvents(this, plugin);
         for (Player player : Bukkit.getOnlinePlayers()) {
@@ -76,7 +83,6 @@ public class PlayerXpTimerHandler implements Listener {
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     UUID playerId = player.getUniqueId();
                     if (!playerTimers.containsKey(playerId)) continue;
-
                     int timeLeft = playerTimers.get(playerId);
                     if (timeLeft <= 0) {
                         applyEndAction(player);
@@ -152,22 +158,12 @@ public class PlayerXpTimerHandler implements Listener {
 
     private void applyEndAction(Player player) {
         String type = config.getString("timer.end_action.type");
-        int level = config.getInt("timer.end_action.level", -1);
-        int duration = config.getInt("timer.end_action.duration", -1);
+        int level = config.getInt("timer.end_action.level", 1) - 1; // Potion effects are 0-indexed
+        int duration = config.getInt("timer.end_action.duration", 5) * 20; // Convert to ticks (20 ticks = 1 second)
 
         // Error: Validate end action configuration
         if (type == null) {
             plugin.getLogger().severe("End action type is missing. Please check 'timer.end_action.type'.");
-            return;
-        }
-
-        if (level == -1) {
-            plugin.getLogger().severe("End action level is missing or invalid. Please check 'timer.end_action.level'.");
-            return;
-        }
-
-        if (duration == -1) {
-            plugin.getLogger().severe("End action duration is missing or invalid. Please check 'timer.end_action.duration'.");
             return;
         }
 
@@ -177,12 +173,34 @@ public class PlayerXpTimerHandler implements Listener {
             return;
         }
 
-        for (PotionEffect effect : player.getActivePotionEffects()) {
-            if (!effect.getType().equals(potionEffectType)) continue;
-            if (effect.getDuration() / 20 <= 1) {
-                player.addPotionEffect(new PotionEffect(potionEffectType, duration * 20, level - 1, true, true));
+        // Check if the player already has this effect
+        PotionEffect currentEffect = player.getPotionEffect(potionEffectType);
+
+        // If the player has the effect and the current effect is stronger (or lasts longer), skip reapplying it
+        if (currentEffect != null) {
+            if (currentEffect.getDuration() > 20) {
+                return; // Current effect is stronger or lasts longer, no need to reapply
             }
         }
+
+        // Apply the potion effect if the player doesn't have it, or if the current effect is weaker/shorter
+        player.addPotionEffect(new PotionEffect(potionEffectType, duration, level, true, true));
+    }
+
+
+    private void startSpawnIncreaseTimer(int timePerSecond) {
+        World world = Bukkit.getWorld("game_map");
+        Location center = new Location(world, 0, 0, 0);
+        int radius = 10;
+        Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (center.distance(player.getLocation()) <= radius) {
+                    int time = playerTimers.get(player.getUniqueId());
+                    playerTimers.put(player.getUniqueId(), time + timePerSecond + 1);
+                }
+            }
+
+        }, 0, 20);
     }
 
     public void increaseTimer(Player player, double distance) {
@@ -225,8 +243,9 @@ public class PlayerXpTimerHandler implements Listener {
         playerTimers.clear();
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerHit(EntityDamageByEntityEvent event) {
+        if (event.isCancelled()) return;
         if (event.getDamager() instanceof Player damager && event.getEntity() instanceof Player target) {
 
             // Calculate the distance between the damager and the target
@@ -249,5 +268,13 @@ public class PlayerXpTimerHandler implements Listener {
             // Increase the timer for the shooter based on the distance
             increaseTimer(shooter, distance);
         }
+    }
+
+    @EventHandler
+    public void onPlayerRegin(EntityRegainHealthEvent event) {
+        if (!(event.getEntity() instanceof Player)) return;
+        if (allowNaturalRegin) return;
+        if (!playerTimers.containsKey(event.getEntity().getUniqueId())) return;
+        if (playerTimers.get(event.getEntity().getUniqueId()) <= 0) event.setCancelled(true);
     }
 }

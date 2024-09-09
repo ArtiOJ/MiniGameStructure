@@ -1,6 +1,7 @@
 package org.limaverse.minigamestructure.utilities;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
@@ -31,7 +32,7 @@ public class WorldChanger {
         this.worldFolder = plugin.getServer().getWorldContainer();
         this.worldFolder = new File(worldFolder, worldName);
         this.bukkitWorld = Bukkit.createWorld(new WorldCreator(this.worldFolder.getName()));
-        player.teleport(bukkitWorld.getSpawnLocation().toHighestLocation());
+        player.teleport(new Location(bukkitWorld, 0, 0, 0));
     }
     public void unload() {
         if (this.bukkitWorld != null) {
