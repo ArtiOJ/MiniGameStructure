@@ -1,7 +1,6 @@
-package org.limaverse.minigamestructure.gameevents;
+package org.limaverse.minigamestructure.utilities;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -9,12 +8,12 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
-public class FreezePlayersEvent implements Listener {
+public class FreezePlayersUtility implements Listener {
     private final JavaPlugin plugin;
     private final long freezeTimeTicks;
     private final boolean lockHead;
 
-    public FreezePlayersEvent(JavaPlugin plugin, int freezeTimeSeconds, boolean lockHead) {
+    public FreezePlayersUtility(JavaPlugin plugin, int freezeTimeSeconds, boolean lockHead) {
         this.plugin = plugin;
         this.freezeTimeTicks = freezeTimeSeconds * 20L; // Convert seconds to ticks
         this.lockHead = lockHead;

@@ -11,5 +11,4 @@ commands:
   setplayerspawn:
   resetmapprecise:
   setchestspawn:
-  addfakeplayer:
-  removefakeplayer:
+  savecenter:

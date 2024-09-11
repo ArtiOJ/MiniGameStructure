@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.limaverse.minigamestructure.MiniGameStructure;
-import org.limaverse.minigamestructure.handlers.ChestSpawningHandler;
+import org.limaverse.minigamestructure.handlers.game.chesthandler.ChestSpawningHandler;
 
 import java.util.ArrayList;
 import java.util.Arrays;

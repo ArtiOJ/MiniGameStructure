@@ -184,7 +184,13 @@ public class GameStartHandler implements Listener {
     private void startGame() {
         if (gameStarted) return;
         gameStarted = true;
-        startGameEvent.startGame();
+        try {
+            startGameEvent.startGame();
+        } catch (Exception e){
+            Bukkit.broadcastMessage(Colorize.format("&eOK, I'll be real with you: &4Something went CRITICALLY wrong with the server when it tried to start the game... &asorry about that...The server will shut down in 10 seconds."));
+            scheduler.runTaskLater(plugin, () -> {
+            }, 10 * 20);
+        }
         clearScoreboard();
     }
 
@@ -202,6 +208,7 @@ public class GameStartHandler implements Listener {
     public void forceStart() {
         gameStarted = true;
         startGameEvent.startGame();
+        clearScoreboard();
     }
 
     private String getStatusMessage() {

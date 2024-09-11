@@ -1,4 +1,4 @@
-package org.limaverse.minigamestructure.gameevents;
+package org.limaverse.minigamestructure.utilities;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -12,12 +12,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
 
-public class CountDownEvent implements Listener {
+public class CountDownUtility implements Listener {
     private final JavaPlugin plugin;
     private final int startCount;
     private final Sound sound;
 
-    public CountDownEvent(JavaPlugin plugin, int startCount, Sound sound) {
+    public CountDownUtility(JavaPlugin plugin, int startCount, Sound sound) {
         this.plugin = plugin;
         this.startCount = startCount;
         this.sound = sound;

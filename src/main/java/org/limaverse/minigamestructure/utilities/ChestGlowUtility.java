@@ -1,4 +1,4 @@
-package org.limaverse.minigamestructure.gameevents;
+package org.limaverse.minigamestructure.utilities;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -6,7 +6,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -14,17 +13,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.ChatColor;
-import org.limaverse.minigamestructure.utilities.Colorize;
-import org.limaverse.minigamestructure.utilities.ScoreboardUtility;
 
 import java.util.ArrayList;
 
-public class ChestGlowEvent implements Listener {
+public class ChestGlowUtility implements Listener {
 
     private final JavaPlugin plugin;
     private int timeLeft;
     private boolean active = false;
-    private final ArrayList<LivingEntity> magmaCubes = new ArrayList<>();
+    private static final ArrayList<LivingEntity> allMagmaCubes = new ArrayList<>();  // Shared across all instances
     private Team magmaCubeTeam;
     private final ChatColor[] colorSequence = {
             ChatColor.DARK_RED, ChatColor.RED, ChatColor.GOLD, ChatColor.YELLOW,
@@ -33,7 +30,7 @@ public class ChestGlowEvent implements Listener {
     private int colorIndex = 0;
     private int interval; // Interval for color transitions
 
-    public ChestGlowEvent(JavaPlugin plugin) {
+    public ChestGlowUtility(JavaPlugin plugin) {
         this.plugin = plugin;
         this.magmaCubeTeam = ScoreboardUtility.getScoreboard().getTeam("magmaCubeTeam");
 
@@ -56,7 +53,7 @@ public class ChestGlowEvent implements Listener {
         magmaCube.setSize(2);
         magmaCube.setGlowing(true);
         magmaCube.setInvulnerable(true);
-        magmaCubes.add(magmaCube);
+        allMagmaCubes.add(magmaCube);  // Add to the shared list
 
         // Add the magma cube to the team
         magmaCubeTeam.addEntry(magmaCube.getUniqueId().toString());
@@ -79,11 +76,7 @@ public class ChestGlowEvent implements Listener {
 
                     if (timeLeft <= 0) {
                         this.cancel();
-                        HandlerList.unregisterAll(ChestGlowEvent.this);
-                        for (LivingEntity magmaCube : magmaCubes) {
-                            magmaCube.remove();
-                        }
-                        active = false;  // Reset the active flag
+                        remove();  // Call the remove() function here
                     }
                 }
             }.runTaskTimer(plugin, 20, 20);  // Run every second (20 ticks)
@@ -110,6 +103,13 @@ public class ChestGlowEvent implements Listener {
             event.getPlayer().sendMessage(Colorize.format("&cChests are locked for &e" + timeLeft + "&c seconds."));
             event.setCancelled(true);
         }
+    }
+
+    public static void remove() {
+        for (LivingEntity magmaCube : allMagmaCubes) {
+            magmaCube.remove();
+        }
+        allMagmaCubes.clear();  // Clear the shared list to avoid memory leaks
     }
 }
 

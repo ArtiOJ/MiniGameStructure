@@ -1,4 +1,4 @@
-package org.limaverse.minigamestructure.handlers;
+package org.limaverse.minigamestructure.handlers.game.chesthandler;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -12,7 +12,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.limaverse.minigamestructure.MiniGameStructure;
-import org.limaverse.minigamestructure.gameevents.ChestGlowEvent;
+import org.limaverse.minigamestructure.utilities.ChestGlowUtility;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +20,7 @@ import java.util.*;
 
 public class ChestSpawningHandler {
     private static final String SPAWNS_FILE_NAME = "chest_group_spawns.yml";
+    private static ChestSpawningHandler instance;
     private final Random random = new Random();
     private final List<Location> platformLocations = new ArrayList<>();
     private final List<Location> chestLocations = new ArrayList<>();
@@ -28,13 +29,13 @@ public class ChestSpawningHandler {
     private final int platformRadius;
     private FileConfiguration config;
     private final World world;
-    private MiniGameStructure plugin;
-    private File configFile;
+    private final MiniGameStructure plugin;
+    private final File configFile;
     private final int CHEST_GLOW_TIME;
 
-    public ChestSpawningHandler(MiniGameStructure plugin) {
+    private ChestSpawningHandler() {
         this.world = Bukkit.getWorld("game_map");
-        this.plugin = plugin;
+        this.plugin = MiniGameStructure.getInstance();
         CHEST_GLOW_TIME = random.nextInt(31) + 120;
         File dataFolder = new File(world.getWorldFolder(), "hunger_games_data");
         configFile = new File(dataFolder, SPAWNS_FILE_NAME);
@@ -44,6 +45,12 @@ public class ChestSpawningHandler {
         loadPlatformLocations();
     }
 
+    public static synchronized ChestSpawningHandler getInstance() {
+        if (instance == null) {
+            instance = new ChestSpawningHandler();
+        }
+        return instance;
+    }
     private void loadPlatformLocations() {
         ConfigurationSection section = config.getConfigurationSection("platform_spawns");
         if (section == null) {
@@ -137,7 +144,7 @@ public class ChestSpawningHandler {
             }
         }
 
-        ChestGlowEvent chestGlowEvent = new ChestGlowEvent(plugin);
+        ChestGlowUtility chestGlowEvent = new ChestGlowUtility(plugin);
 
         Collections.shuffle(containerLocations);
         placeContainers(containerLocations, doubleChestCount, Material.CHEST, true, chestGlowEvent);
@@ -145,7 +152,7 @@ public class ChestSpawningHandler {
         placeContainers(containerLocations, barrelCount, Material.BARREL, false, chestGlowEvent);
     }
 
-    private void placeContainers(List<Location> locations, int count, Material material, boolean isDoubleChest, ChestGlowEvent chestGlowEvent) {
+    private void placeContainers(List<Location> locations, int count, Material material, boolean isDoubleChest, ChestGlowUtility chestGlowEvent) {
         List<BlockFace> faces = Arrays.asList(BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST);
         for (int i = 0; i < count && !locations.isEmpty(); i++) {
             Location loc = locations.remove(0);

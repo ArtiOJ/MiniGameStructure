@@ -1,7 +1,8 @@
-package org.limaverse.minigamestructure.handlers.chesthandler;
+package org.limaverse.minigamestructure.handlers.game.chesthandler;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Barrel;
 import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;
@@ -10,6 +11,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -20,13 +22,14 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ChestHandler implements Listener {
+    private static ChestHandler instance;
     private final Map<String, Integer> containerWeights = new HashMap<>();
     private final Map<String, List<LootItem>> containerLootItems = new HashMap<>();
     private final Set<Location> openedChests = new HashSet<>();
     private final File worldFolder;
     private final File loottablesFile;
 
-    public ChestHandler(MiniGameStructure plugin) {
+    private ChestHandler() {
         this.worldFolder = Bukkit.getWorld("game_map").getWorldFolder();
         File dataFolder = new File(worldFolder, "hunger_games_data");
         this.loottablesFile = new File(dataFolder, "loottables.yml");
@@ -38,7 +41,14 @@ public class ChestHandler implements Listener {
 
         YamlConfiguration lootConfig = YamlConfiguration.loadConfiguration(loottablesFile);
         loadConfig(lootConfig);
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+        Bukkit.getPluginManager().registerEvents(this, MiniGameStructure.getInstance());
+    }
+
+    public static synchronized ChestHandler getInstance() {
+        if (instance == null) {
+            instance = new ChestHandler();
+        }
+        return instance;
     }
 
     private void loadConfig(YamlConfiguration lootConfig) {
@@ -180,6 +190,13 @@ public class ChestHandler implements Listener {
 
             markAsOpened(barrel.getLocation());
             fill(barrel.getInventory(), "BARREL", player);
+        }
+    }
+
+    @EventHandler
+    private void onContainerBreak(BlockBreakEvent event) {
+        if (event.getBlock().equals(Material.CHEST) || event.getBlock().equals(Material.BARREL)) {
+            event.setCancelled(true);
         }
     }
 

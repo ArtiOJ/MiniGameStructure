@@ -4,8 +4,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.limaverse.minigamestructure.commands.*;
 import org.limaverse.minigamestructure.handlers.*;
-import org.limaverse.minigamestructure.handlers.chesthandler.ChestHandler;
+import org.limaverse.minigamestructure.handlers.game.chesthandler.ChestHandler;
 import org.limaverse.minigamestructure.gameevents.StartGameEvent;
+import org.limaverse.minigamestructure.handlers.game.chesthandler.ChestSpawningHandler;
 
 /**
  * The main class for the MiniGameStructure plugin.
@@ -27,8 +28,8 @@ public class MiniGameStructure extends JavaPlugin {
     public void onEnable() {
         resetHandler = new ResetHandler(this);
         resetHandler.initWorld("game_map");
-        chestHandler = new ChestHandler(this);
-        chestSpawningHandler = new ChestSpawningHandler(this);
+        chestHandler = ChestHandler.getInstance();
+        chestSpawningHandler = ChestSpawningHandler.getInstance();
         playerXpTimerHandler = new PlayerXpTimerHandler(this);
 
         // Initialize StartGameEvent with necessary handlers

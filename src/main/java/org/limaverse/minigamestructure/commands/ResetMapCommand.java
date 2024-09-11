@@ -7,7 +7,6 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.limaverse.minigamestructure.MiniGameStructure;
 import org.limaverse.minigamestructure.handlers.ResetHandler;
-import org.limaverse.minigamestructure.handlers.chesthandler.ChestHandler;
 import org.limaverse.minigamestructure.utilities.Colorize;
 
 import java.io.File;

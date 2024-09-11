@@ -15,12 +15,15 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.limaverse.minigamestructure.MiniGameStructure;
-import org.limaverse.minigamestructure.handlers.ChestSpawningHandler;
+import org.limaverse.minigamestructure.handlers.game.chesthandler.ChestSpawningHandler;
 import org.limaverse.minigamestructure.handlers.PlayerXpTimerHandler;
-import org.limaverse.minigamestructure.handlers.chesthandler.ChestHandler;
+import org.limaverse.minigamestructure.handlers.game.chesthandler.ChestHandler;
 import org.limaverse.minigamestructure.handlers.PlayerHandler;
 import org.limaverse.minigamestructure.managers.StartEffectsConfigManager;
 import org.limaverse.minigamestructure.managers.StartItemsConfigManager;
+import org.limaverse.minigamestructure.utilities.ChestGlowUtility;
+import org.limaverse.minigamestructure.utilities.CountDownUtility;
+import org.limaverse.minigamestructure.utilities.FreezePlayersUtility;
 import org.limaverse.minigamestructure.utilities.WorldChanger;
 
 import java.util.List;
@@ -33,9 +36,9 @@ public class StartGameEvent implements Listener {
     private final PlayerXpTimerHandler playerXpTimerHandler;
     boolean allowChests = false;
 
-    public StartGameEvent(MiniGameStructure plugin, PlayerHandler playerHandler, ChestHandler chestHandler, ChestSpawningHandler chestSpawningHandler, PlayerXpTimerHandler playerXpTimerHandler) {
-        this.plugin = plugin;
-        this.playerHandler = playerHandler;
+    public StartGameEvent(ChestHandler chestHandler, ChestSpawningHandler chestSpawningHandler, PlayerXpTimerHandler playerXpTimerHandler) {
+        this.plugin = MiniGameStructure.getInstance();
+        this.playerHandler = PlayerHandler.getInstance();
         this.chestHandler = chestHandler;
         this.chestSpawningHandler = chestSpawningHandler;
         this.playerXpTimerHandler = playerXpTimerHandler;
@@ -48,6 +51,7 @@ public class StartGameEvent implements Listener {
         World world = plugin.getServer().getWorld("game_map");
         WorldChanger worldChanger = new WorldChanger(plugin);
         worldChanger.setWorldAllPlayers("game_map");
+        ChestGlowUtility.remove();
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             allowChests = true;
@@ -75,8 +79,8 @@ public class StartGameEvent implements Listener {
 
             // Run additional events asynchronously
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                new FreezePlayersEvent(plugin, 5, false);
-                new CountDownEvent(plugin, 5, Sound.BLOCK_NOTE_BLOCK_PLING);
+                new FreezePlayersUtility(plugin, 5, false);
+                new CountDownUtility(plugin, 5, Sound.BLOCK_NOTE_BLOCK_PLING);
                 chestHandler.resetChests();
                 configManager.giveStartingItems();
                 playerXpTimerHandler.resetTimerAllTimers();
