@@ -18,9 +18,10 @@ public class PlayerHandler {
     private FileConfiguration config;
     private static final String SPAWNS_FILE_NAME = "player_spawns.yml";
     private final World world;
+    private static PlayerHandler instance;
 
-    public PlayerHandler(MiniGameStructure plugin) {
-        this.plugin = plugin;
+    private PlayerHandler() {
+        this.plugin = MiniGameStructure.getInstance();
         this.world = Bukkit.getWorld("game_map");
         File dataFolder = new File(plugin.getServer().getWorld("game_map").getWorldFolder(), "hunger_games_data");
         configFile = new File(dataFolder, SPAWNS_FILE_NAME);
@@ -123,6 +124,13 @@ public class PlayerHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static PlayerHandler getInstance() {
+        if (instance == null) {
+            instance = new PlayerHandler();
+        }
+        return instance;
     }
 }
 

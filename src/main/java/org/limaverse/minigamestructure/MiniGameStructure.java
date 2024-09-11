@@ -3,13 +3,9 @@ package org.limaverse.minigamestructure;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.limaverse.minigamestructure.commands.*;
-import org.limaverse.minigamestructure.handlers.ChestSpawningHandler;
-import org.limaverse.minigamestructure.handlers.PlayerXpTimerHandler;
-import org.limaverse.minigamestructure.handlers.ResetHandler;
+import org.limaverse.minigamestructure.handlers.*;
 import org.limaverse.minigamestructure.handlers.chesthandler.ChestHandler;
-import org.limaverse.minigamestructure.handlers.PlayerHandler;
 import org.limaverse.minigamestructure.gameevents.StartGameEvent;
-import org.limaverse.minigamestructure.handlers.GameStartHandler;
 
 /**
  * The main class for the MiniGameStructure plugin.
@@ -17,12 +13,12 @@ import org.limaverse.minigamestructure.handlers.GameStartHandler;
  */
 public class MiniGameStructure extends JavaPlugin {
     private ChestHandler chestHandler;
-    private PlayerHandler playerHandler;
     private ChestSpawningHandler chestSpawningHandler;
     private ResetHandler resetHandler;
     private PlayerXpTimerHandler playerXpTimerHandler;
     private GameStartHandler gameStartHandler;
     private StartGameEvent startGameEvent;
+    private static MiniGameStructure instance;
 
     /**
      * Called when the plugin is enabled. Initializes all components and registers commands.
@@ -32,15 +28,14 @@ public class MiniGameStructure extends JavaPlugin {
         resetHandler = new ResetHandler(this);
         resetHandler.initWorld("game_map");
         chestHandler = new ChestHandler(this);
-        playerHandler = new PlayerHandler(this);
         chestSpawningHandler = new ChestSpawningHandler(this);
         playerXpTimerHandler = new PlayerXpTimerHandler(this);
 
         // Initialize StartGameEvent with necessary handlers
-        startGameEvent = new StartGameEvent(this, playerHandler, chestHandler, chestSpawningHandler, playerXpTimerHandler);
+        startGameEvent = new StartGameEvent(chestHandler, chestSpawningHandler, playerXpTimerHandler);
         // Initialize GameStartHandler with conditions for starting the game
         long startDelay = 5 * 20; // 5 seconds delay (100 ticks) after the lobby fills up
-        long fallbackStartDelay = 20 * 20L; // 300 seconds fallback delay (6000 ticks) if the lobby doesn't fill up
+        long fallbackStartDelay = 20 * 20L;
         gameStartHandler = new GameStartHandler(this, startGameEvent, startDelay, fallbackStartDelay);
 
         // Schedule periodic checks for game start conditions
@@ -67,10 +62,6 @@ public class MiniGameStructure extends JavaPlugin {
         return chestHandler;
     }
 
-    public PlayerHandler getPlayerHandler() {
-        return playerHandler;
-    }
-
     public ChestSpawningHandler getChestSpawningHandler() {
         return chestSpawningHandler;
     }
@@ -85,5 +76,9 @@ public class MiniGameStructure extends JavaPlugin {
 
     public GameStartHandler getGameStartHandler() {
         return gameStartHandler;
+    }
+
+    public static MiniGameStructure getInstance() {
+        return instance;
     }
 }
