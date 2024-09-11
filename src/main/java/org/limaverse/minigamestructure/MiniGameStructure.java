@@ -5,7 +5,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.limaverse.minigamestructure.commands.*;
 import org.limaverse.minigamestructure.handlers.*;
 import org.limaverse.minigamestructure.handlers.game.chesthandler.ChestHandler;
-import org.limaverse.minigamestructure.gameevents.StartGameEvent;
+//import org.limaverse.minigamestructure.gameevents.StartGameEvent;
 import org.limaverse.minigamestructure.handlers.game.chesthandler.ChestSpawningHandler;
 
 /**
@@ -16,9 +16,9 @@ public class MiniGameStructure extends JavaPlugin {
     private ChestHandler chestHandler;
     private ChestSpawningHandler chestSpawningHandler;
     private ResetHandler resetHandler;
-    private PlayerXpTimerHandler playerXpTimerHandler;
-    private GameStartHandler gameStartHandler;
-    private StartGameEvent startGameEvent;
+//    private PlayerXpTimerHandler playerXpTimerHandler;
+//    private GameStartHandler gameStartHandler;
+//    private StartGameEvent startGameEvent;
     private static MiniGameStructure instance;
 
     /**
@@ -30,17 +30,17 @@ public class MiniGameStructure extends JavaPlugin {
         resetHandler.initWorld("game_map");
         chestHandler = ChestHandler.getInstance();
         chestSpawningHandler = ChestSpawningHandler.getInstance();
-        playerXpTimerHandler = new PlayerXpTimerHandler(this);
+        //playerXpTimerHandler = new PlayerXpTimerHandler(this);
 
         // Initialize StartGameEvent with necessary handlers
-        startGameEvent = new StartGameEvent(chestHandler, chestSpawningHandler, playerXpTimerHandler);
+        //startGameEvent = new StartGameEvent(chestHandler, chestSpawningHandler, playerXpTimerHandler);
         // Initialize GameStartHandler with conditions for starting the game
-        long startDelay = 5 * 20; // 5 seconds delay (100 ticks) after the lobby fills up
-        long fallbackStartDelay = 20 * 20L;
-        gameStartHandler = new GameStartHandler(this, startGameEvent, startDelay, fallbackStartDelay);
+        //long startDelay = 5 * 20; // 5 seconds delay (100 ticks) after the lobby fills up
+        //long fallbackStartDelay = 20 * 20L;
+        //gameStartHandler = new GameStartHandler(this, startGameEvent, startDelay, fallbackStartDelay);
 
         // Schedule periodic checks for game start conditions
-        Bukkit.getScheduler().runTaskTimer(this, gameStartHandler::checkStartConditions, 0L, 20L);
+        //Bukkit.getScheduler().runTaskTimer(this, gameStartHandler::checkStartConditions, 0L, 20L);
 
         registerCommands();
     }
@@ -49,8 +49,8 @@ public class MiniGameStructure extends JavaPlugin {
      * Registers all commands used in the plugin.
      */
     private void registerCommands() {
-        new StartGameCommand(this, gameStartHandler);
-        new SetPlayerSpawnCommand(this);
+//        new StartGameCommand(this, gameStartHandler);
+//        new SetPlayerSpawnCommand(this);
         new SetChestSpawnCommand(this, chestSpawningHandler);
         new ResetMapCommand(this);
         new ResetMapPreciseCommand(this);
@@ -71,13 +71,13 @@ public class MiniGameStructure extends JavaPlugin {
         return resetHandler;
     }
 
-    public PlayerXpTimerHandler getPlayerXpTimerHandler() {
-        return playerXpTimerHandler;
-    }
-
-    public GameStartHandler getGameStartHandler() {
-        return gameStartHandler;
-    }
+//    public PlayerXpTimerHandler getPlayerXpTimerHandler() {
+//        return playerXpTimerHandler;
+//    }
+//
+//    public GameStartHandler getGameStartHandler() {
+//        return gameStartHandler;
+//    }
 
     public static MiniGameStructure getInstance() {
         return instance;
