@@ -10,12 +10,10 @@ public class RoundStartEvent extends Event {
     private static final HandlerList HANDLERS = new HandlerList();
     private final List<Player> playersInGame;
     private final List<Player> playersSpectating;
-    private final int roundNumber;
 
-    public RoundStartEvent(List<Player> playersInGame, List<Player> playersSpectating, int roundNumber) {
+    public RoundStartEvent(List<Player> playersInGame, List<Player> playersSpectating) {
         this.playersInGame = playersInGame;
         this.playersSpectating = playersSpectating;
-        this.roundNumber = roundNumber;
     }
 
     public List<Player> getPlayersInGame() {
@@ -24,10 +22,6 @@ public class RoundStartEvent extends Event {
 
     public List<Player> getPlayersSpectating() {
         return playersSpectating;
-    }
-
-    public int getRoundNumber() {
-        return roundNumber;
     }
 
     @Override

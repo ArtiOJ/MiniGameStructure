@@ -28,11 +28,13 @@ public class ChestHandler implements Listener {
     private final Set<Location> openedChests = new HashSet<>();
     private final File worldFolder;
     private final File loottablesFile;
+    private final MiniGameStructure plugin;
 
     private ChestHandler() {
         this.worldFolder = Bukkit.getWorld("game_map").getWorldFolder();
         File dataFolder = new File(worldFolder, "hunger_games_data");
         this.loottablesFile = new File(dataFolder, "loottables.yml");
+        plugin = MiniGameStructure.getInstance();
 
         if (!loottablesFile.exists()) {
             Bukkit.getLogger().severe("Loot tables file does not exist: " + loottablesFile.getAbsolutePath());
@@ -41,7 +43,7 @@ public class ChestHandler implements Listener {
 
         YamlConfiguration lootConfig = YamlConfiguration.loadConfiguration(loottablesFile);
         loadConfig(lootConfig);
-        Bukkit.getPluginManager().registerEvents(this, MiniGameStructure.getInstance());
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     public static synchronized ChestHandler getInstance() {

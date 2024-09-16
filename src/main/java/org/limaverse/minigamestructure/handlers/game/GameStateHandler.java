@@ -1,5 +1,7 @@
 package org.limaverse.minigamestructure.handlers.game;
 
+import org.bukkit.Bukkit;
+import org.limaverse.minigamestructure.MiniGameStructure;
 import org.limaverse.minigamestructure.handlers.game.events.RoundEndEvent;
 import org.limaverse.minigamestructure.handlers.game.listeners.GameStartListener;
 import org.limaverse.minigamestructure.handlers.game.playerhandlers.PreGameHandler;
@@ -18,9 +20,10 @@ public class GameStateHandler implements Listener {
 
     // Initialize the game state to PREGAME (or any other state you want)
     private GameStateHandler() {
-        setGameState(GameStates.PREGAME);
         this.preGameHandler = PreGameHandler.getInstance();
         this.gameStartListener = GameStartListener.getInstance();
+        Bukkit.getPluginManager().registerEvents(this, MiniGameStructure.getInstance());
+        setGameState(GameStates.PREGAME);
     }
 
     public static synchronized GameStateHandler getInstance() {
@@ -55,7 +58,9 @@ public class GameStateHandler implements Listener {
     // Handle GameStartEvent and move to the STARTED state
     @EventHandler
     public void onGameStart(GameStartEvent event) {
+        Bukkit.broadcastMessage("Started");
         if (isState(GameStates.PREGAME)) {
+            Bukkit.broadcastMessage("prev state pre");
             preGameHandler.unregister();
             gameStartListener.stopListener();
             setGameState(GameStates.STARTED);

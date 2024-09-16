@@ -148,14 +148,12 @@ public class PreGameHandler implements Listener {
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
-        if (gameStarted) {
-            scheduler.runTaskLater(plugin, () -> setSpectator(player), 5);
-        } else {
-            scheduler.runTaskLater(plugin, () -> {
-                player.setGameMode(GameMode.ADVENTURE);
-                player.setAllowFlight(true);
-            }, 5);
-        }
+
+        scheduler.runTaskLater(plugin, () -> {
+            player.setGameMode(GameMode.ADVENTURE);
+            player.setAllowFlight(true);
+
+       }, 5);
     }
 
     public void checkStartConditions() {

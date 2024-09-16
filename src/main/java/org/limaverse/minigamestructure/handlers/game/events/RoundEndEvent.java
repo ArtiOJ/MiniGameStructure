@@ -10,13 +10,11 @@ public class RoundEndEvent extends Event {
     private static final HandlerList HANDLERS = new HandlerList();
     private final List<Player> playersInGame;
     private final List<Player> playersSpectating;
-    private final int roundNumber;
     private final Player winningPlayer;
 
-    public RoundEndEvent(List<Player> playersInGame, List<Player> playersSpectating, int roundNumber, Player winningPlayer) {
+    public RoundEndEvent(List<Player> playersInGame, List<Player> playersSpectating, Player winningPlayer) {
         this.playersInGame = playersInGame;
         this.playersSpectating = playersSpectating;
-        this.roundNumber = roundNumber;
         this.winningPlayer = winningPlayer;
     }
 
@@ -26,10 +24,6 @@ public class RoundEndEvent extends Event {
 
     public List<Player> getPlayersSpectating() {
         return playersSpectating;
-    }
-
-    public int getRoundNumber() {
-        return roundNumber;
     }
 
     public Player getWinningPlayer() {

@@ -3,7 +3,11 @@ package org.limaverse.minigamestructure;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.limaverse.minigamestructure.commands.*;
+import org.limaverse.minigamestructure.commands.testcommands.GetState;
+import org.limaverse.minigamestructure.commands.testcommands.SetState;
+import org.limaverse.minigamestructure.commands.testcommands.Start;
 import org.limaverse.minigamestructure.handlers.*;
+import org.limaverse.minigamestructure.handlers.game.GameStateHandler;
 import org.limaverse.minigamestructure.handlers.game.chesthandler.ChestHandler;
 //import org.limaverse.minigamestructure.gameevents.StartGameEvent;
 import org.limaverse.minigamestructure.handlers.game.chesthandler.ChestSpawningHandler;
@@ -16,6 +20,7 @@ public class MiniGameStructure extends JavaPlugin {
     private ChestHandler chestHandler;
     private ChestSpawningHandler chestSpawningHandler;
     private ResetHandler resetHandler;
+    private GameStateHandler gameStateHandler;
 //    private PlayerXpTimerHandler playerXpTimerHandler;
 //    private GameStartHandler gameStartHandler;
 //    private StartGameEvent startGameEvent;
@@ -26,12 +31,14 @@ public class MiniGameStructure extends JavaPlugin {
      */
     @Override
     public void onEnable() {
+        instance = this;
         resetHandler = new ResetHandler(this);
         resetHandler.initWorld("game_map");
-        chestHandler = ChestHandler.getInstance();
-        chestSpawningHandler = ChestSpawningHandler.getInstance();
+        gameStateHandler = GameStateHandler.getInstance();
+        new GetState(this);
+        new SetState(this);
+        new Start(this);
         //playerXpTimerHandler = new PlayerXpTimerHandler(this);
-
         // Initialize StartGameEvent with necessary handlers
         //startGameEvent = new StartGameEvent(chestHandler, chestSpawningHandler, playerXpTimerHandler);
         // Initialize GameStartHandler with conditions for starting the game

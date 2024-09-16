@@ -12,3 +12,5 @@ commands:
   resetmapprecise:
   setchestspawn:
   savecenter:
+  getstate:
+  setstate:
