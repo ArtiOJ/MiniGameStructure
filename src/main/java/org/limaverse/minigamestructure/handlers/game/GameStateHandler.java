@@ -47,6 +47,10 @@ public class GameStateHandler implements Listener {
                 gameStartListener.startListener();
                 preGameHandler.startPreGame();
                 break;
+            case STARTED:
+                preGameHandler.unregister();
+                gameStartListener.stopListener();
+                break;
         }
     }
 
@@ -58,11 +62,7 @@ public class GameStateHandler implements Listener {
     // Handle GameStartEvent and move to the STARTED state
     @EventHandler
     public void onGameStart(GameStartEvent event) {
-        Bukkit.broadcastMessage("Started");
         if (isState(GameStates.PREGAME)) {
-            Bukkit.broadcastMessage("prev state pre");
-            preGameHandler.unregister();
-            gameStartListener.stopListener();
             setGameState(GameStates.STARTED);
             // Handle any additional game start logic
         }
