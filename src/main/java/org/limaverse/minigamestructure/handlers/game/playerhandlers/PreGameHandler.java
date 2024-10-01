@@ -49,7 +49,6 @@ public class PreGameHandler implements Listener {
 
     private PreGameHandler() {
         this.plugin = MiniGameStructure.getInstance();
-        this.startDelay = startDelay;
         this.fallbackStartDelay = 20;
         this.scheduler = Bukkit.getScheduler();
         this.startWorld = Bukkit.getWorld("world");

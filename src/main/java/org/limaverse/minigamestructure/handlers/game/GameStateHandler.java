@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.limaverse.minigamestructure.MiniGameStructure;
 import org.limaverse.minigamestructure.handlers.game.events.RoundEndEvent;
 import org.limaverse.minigamestructure.handlers.game.listeners.GameStartListener;
+import org.limaverse.minigamestructure.handlers.game.listeners.RoundEndListener;
 import org.limaverse.minigamestructure.handlers.game.playerhandlers.PreGameHandler;
 import org.limaverse.minigamestructure.handlers.game.events.GameStartEvent;
 import org.limaverse.minigamestructure.handlers.game.events.GameEndEvent;
@@ -16,12 +17,14 @@ public class GameStateHandler implements Listener {
     private GameStates currentState;
     private final PreGameHandler preGameHandler;
     private final GameStartListener gameStartListener;
+    private RoundEndListener roundEndListener;
     private static GameStateHandler instance;
 
-    // Initialize the game state to PREGAME (or any other state you want)
+    // Initialize the game state to PREGAME
     private GameStateHandler() {
         this.preGameHandler = PreGameHandler.getInstance();
         this.gameStartListener = GameStartListener.getInstance();
+        this.roundEndListener = RoundEndListener.getInstance();
         Bukkit.getPluginManager().registerEvents(this, MiniGameStructure.getInstance());
         setGameState(GameStates.PREGAME);
     }
@@ -47,6 +50,11 @@ public class GameStateHandler implements Listener {
                 gameStartListener.startListener();
                 preGameHandler.startPreGame();
                 break;
+            case STARTED:
+                roundEndListener.startListener();
+                preGameHandler.unregister();
+                gameStartListener.stopListener();
+                break;
         }
     }
 
@@ -58,11 +66,7 @@ public class GameStateHandler implements Listener {
     // Handle GameStartEvent and move to the STARTED state
     @EventHandler
     public void onGameStart(GameStartEvent event) {
-        Bukkit.broadcastMessage("Started");
         if (isState(GameStates.PREGAME)) {
-            Bukkit.broadcastMessage("prev state pre");
-            preGameHandler.unregister();
-            gameStartListener.stopListener();
             setGameState(GameStates.STARTED);
             // Handle any additional game start logic
         }
