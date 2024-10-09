@@ -18,6 +18,7 @@ public class GameStateHandler implements Listener {
     private final PreGameHandler preGameHandler;
     private final GameStartListener gameStartListener;
     private RoundEndListener roundEndListener;
+    private GameStats gameStats;
     private static GameStateHandler instance;
 
     // Initialize the game state to PREGAME
@@ -25,6 +26,7 @@ public class GameStateHandler implements Listener {
         this.preGameHandler = PreGameHandler.getInstance();
         this.gameStartListener = GameStartListener.getInstance();
         this.roundEndListener = RoundEndListener.getInstance();
+        this.gameStats = GameStats.getInstance();
         Bukkit.getPluginManager().registerEvents(this, MiniGameStructure.getInstance());
         setGameState(GameStates.PREGAME);
     }

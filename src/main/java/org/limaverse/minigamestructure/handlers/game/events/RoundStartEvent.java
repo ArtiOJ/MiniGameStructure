@@ -16,6 +16,7 @@ public class RoundStartEvent extends Event {
         this.playersSpectating = playersSpectating;
     }
 
+
     public List<Player> getPlayersInGame() {
         return playersInGame;
     }

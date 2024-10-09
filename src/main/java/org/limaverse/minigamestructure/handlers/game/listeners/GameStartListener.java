@@ -76,8 +76,10 @@ public class GameStartListener implements Listener {
         worldChanger.setWorldAllPlayers("game_map");
 
         scheduler.runTaskLater(plugin, () -> {
+            Bukkit.broadcastMessage("Running");
             StartItemsConfigManager configManager = new StartItemsConfigManager(plugin);
             for (Player player : event.getPlayers()) {
+                Bukkit.broadcastMessage("players");
                 player.getInventory().clear();
                 player.clearActivePotionEffects();
                 player.setGameMode(GameMode.SURVIVAL);

@@ -23,12 +23,10 @@ import org.bukkit.scoreboard.DisplaySlot;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class PreGameHandler implements Listener {
-    private static PreGameHandler instance; // Singleton instance
+    private static PreGameHandler instance;
 
     private final MiniGameStructure plugin;
     private long startDelay;
@@ -45,7 +43,7 @@ public class PreGameHandler implements Listener {
     private World gameWorld;
     private BukkitScheduler scheduler;
     private final List<Player> spectatingPlayers = new ArrayList<>();
-    private final List<Player> gamePlayers = new ArrayList<>(); // Store players in the game
+    private final List<Player> gamePlayers = new ArrayList<>();
 
     private PreGameHandler() {
         this.plugin = MiniGameStructure.getInstance();
@@ -54,22 +52,19 @@ public class PreGameHandler implements Listener {
         this.startWorld = Bukkit.getWorld("world");
         this.gameWorld = Bukkit.getWorld("game_map");
 
-
         File dataFolder = new File(plugin.getServer().getWorld("game_map").getWorldFolder(), "hunger_games_data");
         File configFile = new File(dataFolder, SPAWNS_FILE_NAME);
         YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
         MAX_PLAYER_COUNT = config.getInt("max_players");
 
-
         // Register the handler as an event listener
         Bukkit.getPluginManager().registerEvents(this, plugin);
 
-        // Setup scoreboard
+        // Retrieve the shared scoreboard and objective
         this.scoreboard = ScoreboardUtility.getScoreboard();
-        this.objective = scoreboard.getObjective("gameStart");
+        this.objective = ScoreboardUtility.getObjective();
     }
 
-    // Singleton instance method
     public static synchronized PreGameHandler getInstance() {
         if (instance == null) {
             instance = new PreGameHandler();
@@ -78,38 +73,38 @@ public class PreGameHandler implements Listener {
     }
 
     public synchronized void unregister() {
-        // Cancel any active countdown tasks
         if (countdownTask != null && !countdownTask.isCancelled()) {
             countdownTask.cancel();
         }
-
-        // Unregister event listeners
         HandlerList.unregisterAll(this);
-
-        // Clear and reset player-related data
         spectatingPlayers.clear();
         gamePlayers.clear();
         currentPlayerCount = 0;
         gameStarted = false;
         fallbackTimerStarted = false;
-
-        // Clear the scoreboard
-        clearScoreboard();
-
-        // Set instance to null
+        clearPreGameEntries(); // Only clear entries set by PreGameHandler
         instance = null;
     }
 
-    // Update scoreboard method
+    // Update scoreboard method (adds or updates specific scores)
     private void updateScoreboard(String statusMessage) {
-        scoreboard.getEntries().forEach(scoreboard::resetScores);
+        // Clear previous entries created by PreGameHandler
+        clearPreGameEntries();
+
         objective.getScore(" ").setScore(3);
         objective.getScore(Colorize.format("&aPlayers: &e" + currentPlayerCount + "&7/&e" + MAX_PLAYER_COUNT)).setScore(2);
         objective.getScore(Colorize.format("&bStatus: &f" + statusMessage)).setScore(1);
 
-        for (var player : Bukkit.getOnlinePlayers()) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
             player.setScoreboard(scoreboard);
         }
+    }
+
+    // Clear only the entries that were added by PreGameHandler
+    private void clearPreGameEntries() {
+        scoreboard.resetScores(" ");
+        scoreboard.resetScores(Colorize.format("&aPlayers: &e" + currentPlayerCount + "&7/&e" + MAX_PLAYER_COUNT));
+        scoreboard.resetScores(Colorize.format("&bStatus: &f" + getStatusMessage()));
     }
 
     @EventHandler
@@ -147,12 +142,10 @@ public class PreGameHandler implements Listener {
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
-
         scheduler.runTaskLater(plugin, () -> {
             player.setGameMode(GameMode.ADVENTURE);
             player.setAllowFlight(true);
-
-       }, 5);
+        }, 5);
     }
 
     public void checkStartConditions() {
@@ -199,44 +192,27 @@ public class PreGameHandler implements Listener {
     private void startGame() {
         if (gameStarted) return;
         gameStarted = true;
-
-        // Call the GameStartEvent
         Bukkit.getPluginManager().callEvent(new GameStartEvent(gamePlayers, spectatingPlayers));
-
-        clearScoreboard();
-    }
-
-    private void clearScoreboard() {
-        for (var player : Bukkit.getOnlinePlayers()) {
-            Scoreboard playerScoreboard = player.getScoreboard();
-            Objective sidebarObjective = playerScoreboard.getObjective(DisplaySlot.SIDEBAR);
-            if (sidebarObjective != null) {
-                sidebarObjective.unregister();
-            }
-        }
+        clearPreGameEntries(); // Clear only PreGameHandler-related entries
     }
 
     public void forceStart() {
         gameStarted = true;
-
-        // Call the GameStartEvent
         Bukkit.getPluginManager().callEvent(new GameStartEvent(gamePlayers, spectatingPlayers));
-
-        clearScoreboard();
+        clearPreGameEntries(); // Clear only PreGameHandler-related entries
     }
 
     public void startPreGame() {
         scheduler.runTaskTimer(plugin, this::checkStartConditions, 0L, 20L);
     }
 
-    // Function to set a player as a spectator
     public void setSpectator(Player player) {
         if (gamePlayers.contains(player)) {
-            gamePlayers.remove(player); // Remove player from game
+            gamePlayers.remove(player);
         }
         player.setGameMode(GameMode.SPECTATOR);
         player.teleport(gameWorld.getSpawnLocation());
-        spectatingPlayers.add(player); // Add player to spectator list
+        spectatingPlayers.add(player);
     }
 
     private String getStatusMessage() {

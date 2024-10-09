@@ -14,3 +14,4 @@ commands:
   savecenter:
   getstate:
   setstate:
+  eliminate:

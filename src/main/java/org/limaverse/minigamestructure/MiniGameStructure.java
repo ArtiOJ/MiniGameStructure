@@ -3,6 +3,7 @@ package org.limaverse.minigamestructure;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.limaverse.minigamestructure.commands.*;
+import org.limaverse.minigamestructure.commands.testcommands.EliminatePlayer;
 import org.limaverse.minigamestructure.commands.testcommands.GetState;
 import org.limaverse.minigamestructure.commands.testcommands.SetState;
 import org.limaverse.minigamestructure.commands.testcommands.Start;
@@ -38,6 +39,7 @@ public class MiniGameStructure extends JavaPlugin {
         new GetState(this);
         new SetState(this);
         new Start(this);
+        new EliminatePlayer(this);
         //playerXpTimerHandler = new PlayerXpTimerHandler(this);
         // Initialize StartGameEvent with necessary handlers
         //startGameEvent = new StartGameEvent(chestHandler, chestSpawningHandler, playerXpTimerHandler);

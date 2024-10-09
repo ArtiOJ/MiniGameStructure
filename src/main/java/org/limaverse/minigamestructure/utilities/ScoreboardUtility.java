@@ -7,7 +7,7 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.DisplaySlot;
 
 public class ScoreboardUtility {
-    private static Scoreboard scoreboard;
+    private static final Scoreboard scoreboard; // Keep the scoreboard static to share it globally
 
     static {
         ScoreboardManager scoreboardManager = Bukkit.getScoreboardManager();
@@ -16,7 +16,12 @@ public class ScoreboardUtility {
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
     }
 
+    // Return the same scoreboard instance everywhere
     public static Scoreboard getScoreboard() {
         return scoreboard;
+    }
+
+    public static Objective getObjective() {
+        return scoreboard.getObjective("gameStart");
     }
 }

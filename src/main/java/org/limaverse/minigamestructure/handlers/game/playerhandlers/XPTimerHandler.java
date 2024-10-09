@@ -19,6 +19,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.limaverse.minigamestructure.MiniGameStructure;
+import org.limaverse.minigamestructure.handlers.game.GameStats;
 
 import java.io.File;
 import java.util.HashMap;
@@ -38,9 +39,11 @@ public class XPTimerHandler implements Listener {
     private final int waterScale;
     private BukkitTask runnable;
     private boolean allowNaturalRegen;
+    private GameStats gameStats;
 
     private XPTimerHandler() {
         this.plugin = MiniGameStructure.getInstance();
+        this.gameStats = GameStats.getInstance();
         File dataFolder = new File(plugin.getServer().getWorld("game_map").getWorldFolder(), "hunger_games_data");
         configFile = new File(dataFolder, "timer.yml");
         config = YamlConfiguration.loadConfiguration(configFile);
@@ -90,7 +93,7 @@ public class XPTimerHandler implements Listener {
         startSpawnIncreaseTimer(1);
 
         Bukkit.getPluginManager().registerEvents(this, plugin);
-        for (Player player : Bukkit.getOnlinePlayers()) {
+        for (Player player : gameStats.getActiveGamePlayers()) {
             UUID playerId = player.getUniqueId();
             playerTimers.put(playerId, initialDuration);
 
@@ -105,7 +108,7 @@ public class XPTimerHandler implements Listener {
                     return;
                 }
 
-                for (Player player : Bukkit.getOnlinePlayers()) {
+                for (Player player : gameStats.getAlivePlayers()) {
                     UUID playerId = player.getUniqueId();
                     if (!playerTimers.containsKey(playerId)) continue;
                     int timeLeft = playerTimers.get(playerId);
@@ -209,7 +212,7 @@ public class XPTimerHandler implements Listener {
         Location center = new Location(world, 0, 0, 0);
         int radius = 10;
         Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-            for (Player player : Bukkit.getOnlinePlayers()) {
+            for (Player player : gameStats.getAlivePlayers()) {
                 if (center.distance(player.getLocation()) <= radius) {
                     int time = playerTimers.get(player.getUniqueId());
                     playerTimers.put(player.getUniqueId(), time + timePerSecond + 1);
