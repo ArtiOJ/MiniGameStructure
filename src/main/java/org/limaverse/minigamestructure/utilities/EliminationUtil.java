@@ -1,5 +1,6 @@
 package org.limaverse.minigamestructure.utilities;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -37,7 +38,9 @@ public class EliminationUtil {
         player.setGameMode(GameMode.SPECTATOR);
 
         // Change player's world to 'game_map'
-        worldChanger.setWorld("game_map", player);
+        Bukkit.getScheduler().runTaskLater(MiniGameStructure.getInstance(), () -> {
+            worldChanger.setWorld("game_map", player);
+        }, 5L);
 
         // Send formatted elimination message
         player.sendMessage(Colorize.format("&e--------&cYou were eliminated!&e--------"));

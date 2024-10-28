@@ -10,6 +10,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.limaverse.minigamestructure.MiniGameStructure;
+import org.limaverse.minigamestructure.handlers.game.GameStats;
 import org.limaverse.minigamestructure.utilities.CountDownUtility;
 import org.limaverse.minigamestructure.utilities.FreezePlayersUtility;
 import org.limaverse.minigamestructure.handlers.game.chesthandler.ChestHandler;
@@ -76,10 +77,8 @@ public class GameStartListener implements Listener {
         worldChanger.setWorldAllPlayers("game_map");
 
         scheduler.runTaskLater(plugin, () -> {
-            Bukkit.broadcastMessage("Running");
             StartItemsConfigManager configManager = new StartItemsConfigManager(plugin);
-            for (Player player : event.getPlayers()) {
-                Bukkit.broadcastMessage("players");
+            for (Player player : GameStats.getInstance().getAlivePlayers()) {
                 player.getInventory().clear();
                 player.clearActivePotionEffects();
                 player.setGameMode(GameMode.SURVIVAL);
@@ -87,7 +86,7 @@ public class GameStartListener implements Listener {
                 player.setExp(1);
             }
 
-            for (Player player : event.getSpectators()) {
+            for (Player player : GameStats.getInstance().getGameSpectators()) {
                 player.setGameMode(GameMode.SPECTATOR);
             }
 

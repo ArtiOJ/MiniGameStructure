@@ -82,29 +82,33 @@ public class PreGameHandler implements Listener {
         currentPlayerCount = 0;
         gameStarted = false;
         fallbackTimerStarted = false;
-        clearPreGameEntries(); // Only clear entries set by PreGameHandler
+        wipeBoard(); // Only clear entries set by PreGameHandler
         instance = null;
     }
 
     // Update scoreboard method (adds or updates specific scores)
     private void updateScoreboard(String statusMessage) {
         // Clear previous entries created by PreGameHandler
-        clearPreGameEntries();
+        resetBoard();
 
-        objective.getScore(" ").setScore(3);
-        objective.getScore(Colorize.format("&aPlayers: &e" + currentPlayerCount + "&7/&e" + MAX_PLAYER_COUNT)).setScore(2);
-        objective.getScore(Colorize.format("&bStatus: &f" + statusMessage)).setScore(1);
+        // Set scores in the desired order and with unique identifiers
+        objective.getScore(" ").setScore(3);  // Blank line for separation
+        objective.getScore(Colorize.format("&aPlayers: &e" + currentPlayerCount + "&7/&e" + MAX_PLAYER_COUNT)).setScore(2);  // Player count
+        objective.getScore(Colorize.format("&bStatus: &f" + statusMessage)).setScore(1);  // Status message
 
+        // Apply the updated scoreboard to all online players
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.setScoreboard(scoreboard);
         }
     }
 
     // Clear only the entries that were added by PreGameHandler
-    private void clearPreGameEntries() {
-        scoreboard.resetScores(" ");
-        scoreboard.resetScores(Colorize.format("&aPlayers: &e" + currentPlayerCount + "&7/&e" + MAX_PLAYER_COUNT));
-        scoreboard.resetScores(Colorize.format("&bStatus: &f" + getStatusMessage()));
+    private void resetBoard() {
+        scoreboard.getEntries().forEach(scoreboard::resetScores);
+    }
+
+    private void wipeBoard() {
+        scoreboard.clearSlot(DisplaySlot.SIDEBAR);
     }
 
     @EventHandler
@@ -193,13 +197,13 @@ public class PreGameHandler implements Listener {
         if (gameStarted) return;
         gameStarted = true;
         Bukkit.getPluginManager().callEvent(new GameStartEvent(gamePlayers, spectatingPlayers));
-        clearPreGameEntries(); // Clear only PreGameHandler-related entries
+        wipeBoard(); // Clear only PreGameHandler-related entries
     }
 
     public void forceStart() {
         gameStarted = true;
         Bukkit.getPluginManager().callEvent(new GameStartEvent(gamePlayers, spectatingPlayers));
-        clearPreGameEntries(); // Clear only PreGameHandler-related entries
+        wipeBoard(); // Clear only PreGameHandler-related entries
     }
 
     public void startPreGame() {

@@ -3,6 +3,7 @@ package org.limaverse.minigamestructure.handlers.game;
 import org.bukkit.Bukkit;
 import org.limaverse.minigamestructure.MiniGameStructure;
 import org.limaverse.minigamestructure.handlers.game.events.RoundEndEvent;
+import org.limaverse.minigamestructure.handlers.game.listeners.EliminationListener;
 import org.limaverse.minigamestructure.handlers.game.listeners.GameStartListener;
 import org.limaverse.minigamestructure.handlers.game.listeners.RoundEndListener;
 import org.limaverse.minigamestructure.handlers.game.playerhandlers.PreGameHandler;
@@ -19,6 +20,7 @@ public class GameStateHandler implements Listener {
     private final GameStartListener gameStartListener;
     private RoundEndListener roundEndListener;
     private GameStats gameStats;
+    private EliminationListener eliminationListener;
     private static GameStateHandler instance;
 
     // Initialize the game state to PREGAME
@@ -27,6 +29,7 @@ public class GameStateHandler implements Listener {
         this.gameStartListener = GameStartListener.getInstance();
         this.roundEndListener = RoundEndListener.getInstance();
         this.gameStats = GameStats.getInstance();
+        this.eliminationListener = EliminationListener.getInstance();
         Bukkit.getPluginManager().registerEvents(this, MiniGameStructure.getInstance());
         setGameState(GameStates.PREGAME);
     }
@@ -53,9 +56,14 @@ public class GameStateHandler implements Listener {
                 preGameHandler.startPreGame();
                 break;
             case STARTED:
-                roundEndListener.startListener();
                 preGameHandler.unregister();
                 gameStartListener.stopListener();
+                roundEndListener.startListener();
+                eliminationListener.startListener();
+                break;
+            case WAITING:
+                eliminationListener.startListener();
+                roundEndListener.stopListener();
                 break;
         }
     }
